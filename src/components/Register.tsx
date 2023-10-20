@@ -22,8 +22,8 @@ const Register: React.FC<{}> = () => {
   };
 
   const [fields, setFields] = useState<Record<string, any>>({
-    'first-name': '',
-    'last-name': '',
+    firstName: '',
+    lastName: '',
     email: '',
   });
 
@@ -54,18 +54,20 @@ const Register: React.FC<{}> = () => {
       </Grid>
       <Grid item>
         <TextField
-          id='first-name'
+          id='firstName'
           label='First Name'
           variant='outlined'
           style={styles.itemWidth}
+          value={fields.firstName}
         />
       </Grid>
       <Grid item>
         <TextField
-          id='C'
+          id='lastName'
           label='Last Name'
           variant='outlined'
           style={styles.itemWidth}
+          value={fields.lastName}
         />
       </Grid>
       <Grid item>
