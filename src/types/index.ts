@@ -6,3 +6,9 @@ export interface IMenuItem {
   literal: string;
   Icon: OverridableComponent<SvgIconTypeMap>;
 };
+
+export interface IUser {
+    firstName: string;
+    lastName: string;
+    token: string;
+};

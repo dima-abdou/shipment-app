@@ -1,6 +1,9 @@
 import { Button, Container, Grid, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
+import DataService from '../services/dataServices';
+import { IUser } from '../types';
+import { setUser } from '.';
 
 const styles = {
   MyLogo: {
@@ -17,18 +20,10 @@ const Login: React.FC<{}> = () => {
   // React States
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  // User Login info
-  const database = [
-    {
-      username: 'user1',
-      password: 'pass1',
-    },
-    {
-      username: 'user2',
-      password: 'pass2',
-    },
-  ];
+    const [fields, setFields] = useState<Record<string, any>>({
+        email: '',
+        password: ''
+    });
 
   const errors = {
     uname: 'invalid username',
@@ -45,27 +40,18 @@ const Login: React.FC<{}> = () => {
     navigate('/landing');
   };
 
-  const handleSubmit = (event: any) => {
-    //Prevent page reload
-    event.preventDefault();
-
-    var { uname, pass } = document.forms[0];
-
-    // Find user login info
-    const userData = database.find((user) => user.username === uname.value);
-
-    // Compare user info
-    if (userData) {
-      if (userData.password !== pass.value) {
-        // Invalid password
-        setErrorMessages({ name: 'pass', message: errors.pass });
-      } else {
-        setIsSubmitted(true);
+  const handleSubmit = async (event: any) => {
+      var result = await DataService.post("api/user/login", fields);
+      if (result.ok) {
+          const user: IUser = await result.json();
+          setUser(user);
+          navigateToLandingPage();
       }
-    } else {
-      // Username not found
-      setErrorMessages({ name: 'uname', message: errors.uname });
-    }
+      else if (result.status == 404) {
+          //toast
+      } else {
+          //internal error
+      }
   };
 
   // Generate JSX code for error message
@@ -91,10 +77,11 @@ const Login: React.FC<{}> = () => {
       </Grid>
       <Grid item>
         <TextField
-          id='user-name'
-          label='User Name'
+          id='email'
+          label='Email'
           variant='outlined'
-          style={styles.itemWidth}
+          style={styles.itemWidth},
+          value={fields.email}
         />
       </Grid>
       <Grid item>
@@ -103,14 +90,15 @@ const Login: React.FC<{}> = () => {
           label='Password'
           type='password'
           variant='outlined'
-          style={styles.itemWidth}
+          style={styles.itemWidth},
+          value={fields.password}
         />
       </Grid>
       <Grid item>
         <Button
           variant='contained'
           style={styles.itemWidth}
-          onClick={navigateToLandingPage}
+          onClick={handleSubmit}
         >
           Login
         </Button>

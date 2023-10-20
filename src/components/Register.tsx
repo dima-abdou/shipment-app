@@ -2,6 +2,9 @@ import { Button, Grid, TextField } from '@mui/material';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { MuiTelInput } from 'mui-tel-input';
+import DataService from '../services/dataServices';
+import { IUser } from '../types';
+import { setUser } from '.';
 
 const styles = {
   MyLogo: {
@@ -25,6 +28,8 @@ const Register: React.FC<{}> = () => {
     firstName: '',
     lastName: '',
     email: '',
+    phoneNumber: '',
+    password: ''
   });
 
   const navigate = useNavigate();
@@ -33,8 +38,17 @@ const Register: React.FC<{}> = () => {
     navigate('/landing');
   };
 
-  const handleSubmit = (event: any) => {
-    // data
+  const handleSubmit = async (event: any) => {
+      var result = await DataService.post("api/user", fields);
+      if (result.ok) {
+          const user: IUser = await result.json();
+          setUser(user);
+      }
+      else if(result.status == 400) {
+          //toast
+      } else {
+          //internal error
+      }
   };
 
   return (
@@ -76,7 +90,8 @@ const Register: React.FC<{}> = () => {
           label='Email'
           type='email'
           variant='outlined'
-          style={styles.itemWidth}
+          style={styles.itemWidth},
+          value={fields.email}
         />
       </Grid>
       <Grid item>
@@ -84,11 +99,21 @@ const Register: React.FC<{}> = () => {
           id='phoneNumber'
           label='Phone Number'
           variant='outlined'
-          value={phoneValue}
+          value={fields.phoneNumber},
           onChange={handlePhoneValueChange}
           style={styles.itemWidth}
         />
-      </Grid>
+        </Grid>
+        <Grid item>
+          <TextField
+            id='password'
+            label='Password'
+            type='password'
+            variant='outlined'
+            value={fields.password},
+            style={styles.itemWidth}
+            />
+        </Grid>
       <Grid item>
         <Button
           variant='contained'
