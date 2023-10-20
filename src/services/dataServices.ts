@@ -2,7 +2,8 @@ import { IAbstractRecord } from '../models';
 import { clearUserToken, getUserToken } from '../utils/userUtils';
 
 export default class DataService {
-  private static baseUrl = '';
+  private static baseUrl =
+    'https://shipmentshare-services-ap-uae-01.azurewebsites.net/';
 
   private static defaultTimeout = 300000;
 
