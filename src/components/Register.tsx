@@ -1,5 +1,5 @@
 import { Button, Grid, TextField } from '@mui/material';
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { MuiTelInput } from 'mui-tel-input';
 
@@ -21,13 +21,21 @@ const Register: React.FC<{}> = () => {
     setPhoneValue(newValue);
   };
 
+  const [fields, setFields] = useState<Record<string, any>>({
+    'first-name': '',
+    'last-name': '',
+    email: '',
+  });
+
   const navigate = useNavigate();
 
   const navigateToLandingPage = () => {
     navigate('/landing');
   };
 
-  const handleSubmit = (event: any) => {};
+  const handleSubmit = (event: any) => {
+    // data
+  };
 
   return (
     <Grid
@@ -54,7 +62,7 @@ const Register: React.FC<{}> = () => {
       </Grid>
       <Grid item>
         <TextField
-          id='last-name'
+          id='C'
           label='Last Name'
           variant='outlined'
           style={styles.itemWidth}
@@ -71,7 +79,7 @@ const Register: React.FC<{}> = () => {
       </Grid>
       <Grid item>
         <MuiTelInput
-          id='PhoneNumber'
+          id='phoneNumber'
           label='Phone Number'
           variant='outlined'
           value={phoneValue}
@@ -83,7 +91,7 @@ const Register: React.FC<{}> = () => {
         <Button
           variant='contained'
           style={styles.itemWidth}
-          onClick={navigateToLandingPage}
+          onClick={handleSubmit}
         >
           Register
         </Button>
