@@ -3,15 +3,20 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
 import DataService from '../services/dataServices';
 import { IUser } from '../types';
-import { setUser } from '.';
+import User from '../models/user';
+// import logoShip from '../assets/images/logoShip.jpg'
 
 const styles = {
   MyLogo: {
-    width: '50%',
+    width: '65%',
     marginLeft: '20%',
     marginTop: '10%',
   },
   itemWidth: {
+    width: '300px',
+  },
+  button: {
+    backgroundColor: '#2c3e52',
     width: '300px',
   },
 };
@@ -20,10 +25,10 @@ const Login: React.FC<{}> = () => {
   // React States
   const [errorMessages, setErrorMessages] = useState({});
   const [isSubmitted, setIsSubmitted] = useState(false);
-    const [fields, setFields] = useState<Record<string, any>>({
-        email: '',
-        password: ''
-    });
+  const [fields, setFields] = useState<Record<string, any>>({
+    email: '',
+    password: '',
+  });
 
   const errors = {
     uname: 'invalid username',
@@ -40,18 +45,24 @@ const Login: React.FC<{}> = () => {
     navigate('/landing');
   };
 
+  const handleChange = (e: any) => {
+    setFields((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   const handleSubmit = async (event: any) => {
-      var result = await DataService.post("api/user/login", fields);
-      if (result.ok) {
-          const user: IUser = await result.json();
-          setUser(user);
-          navigateToLandingPage();
-      }
-      else if (result.status == 404) {
-          //toast
-      } else {
-          //internal error
-      }
+    var result = await DataService.post('api/user/login', fields);
+    if (result.ok) {
+      const user: IUser = await result.json();
+      User.setUser(user);
+      navigateToLandingPage();
+    } else if (result.status == 404) {
+      //toast
+    } else {
+      //internal error
+    }
   };
 
   // Generate JSX code for error message
@@ -70,34 +81,36 @@ const Login: React.FC<{}> = () => {
     >
       <Grid item>
         <img
-          src={`/images/shipment-logo.png`}
+          src={`/images/logoShip.jpg`} //{`/images/shipment-logo.png`}
           loading='lazy'
           style={styles.MyLogo}
         />
       </Grid>
       <Grid item>
         <TextField
-          id='email'
+          name='email'
           label='Email'
           variant='outlined'
-          style={styles.itemWidth},
+          style={styles.itemWidth}
           value={fields.email}
+          onChange={handleChange}
         />
       </Grid>
       <Grid item>
         <TextField
-          id='password'
+          name='password'
           label='Password'
           type='password'
           variant='outlined'
-          style={styles.itemWidth},
+          style={styles.itemWidth}
           value={fields.password}
+          onChange={handleChange}
         />
       </Grid>
       <Grid item>
         <Button
           variant='contained'
-          style={styles.itemWidth}
+          style={styles.button}
           onClick={handleSubmit}
         >
           Login
@@ -106,7 +119,7 @@ const Login: React.FC<{}> = () => {
       <Grid item>
         <Button
           variant='contained'
-          style={styles.itemWidth}
+          style={styles.button}
           onClick={navigateToRegister}
         >
           Register

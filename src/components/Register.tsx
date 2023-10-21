@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router';
 import { MuiTelInput } from 'mui-tel-input';
 import DataService from '../services/dataServices';
 import { IUser } from '../types';
-import { setUser } from '.';
-
+import { toast } from 'react-toastify';
+import User from '../models/user';
 const styles = {
   MyLogo: {
     width: '50%',
@@ -15,13 +15,20 @@ const styles = {
   itemWidth: {
     width: '300px',
   },
+  button: {
+    backgroundColor: '#2c3e52',
+    width: '300px',
+  },
 };
 
 const Register: React.FC<{}> = () => {
-  const [phoneValue, setPhoneValue] = React.useState('');
-
+  // const [phoneValue, setPhoneValue] = React.useState('');
   const handlePhoneValueChange = (newValue: string) => {
-    setPhoneValue(newValue);
+    //  setPhoneValue(newValue);
+    setFields((prevState) => ({
+      ...prevState,
+      phoneNumber: newValue,
+    }));
   };
 
   const [fields, setFields] = useState<Record<string, any>>({
@@ -29,8 +36,15 @@ const Register: React.FC<{}> = () => {
     lastName: '',
     email: '',
     phoneNumber: '',
-    password: ''
+    password: '',
   });
+
+  const handleChange = (e: any) => {
+    setFields((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const navigate = useNavigate();
 
@@ -39,16 +53,17 @@ const Register: React.FC<{}> = () => {
   };
 
   const handleSubmit = async (event: any) => {
-      var result = await DataService.post("api/user", fields);
-      if (result.ok) {
-          const user: IUser = await result.json();
-          setUser(user);
-      }
-      else if(result.status == 400) {
-          //toast
-      } else {
-          //internal error
-      }
+    debugger;
+    var result = await DataService.post('api/user', fields);
+    if (result.ok) {
+      const user: IUser = await result.json();
+      User.setUser(user);
+      navigateToLandingPage();
+    } else if (result.status === 400) {
+      toast.error('Submit Failed');
+    } else {
+      toast.error('Problem Occured');
+    }
   };
 
   return (
@@ -61,63 +76,67 @@ const Register: React.FC<{}> = () => {
     >
       <Grid item>
         <img
-          src={`/images/shipment-logo.png`}
+          src={`/images/logoShip.jpg`}
           loading='lazy'
           style={styles.MyLogo}
         />
       </Grid>
       <Grid item>
         <TextField
-          id='firstName'
+          name='firstName'
           label='First Name'
           variant='outlined'
           style={styles.itemWidth}
           value={fields.firstName}
+          onChange={handleChange}
         />
       </Grid>
       <Grid item>
         <TextField
-          id='lastName'
+          name='lastName'
           label='Last Name'
           variant='outlined'
           style={styles.itemWidth}
           value={fields.lastName}
+          onChange={handleChange}
         />
       </Grid>
       <Grid item>
         <TextField
-          id='email'
+          name='email'
           label='Email'
           type='email'
           variant='outlined'
-          style={styles.itemWidth},
+          style={styles.itemWidth}
           value={fields.email}
+          onChange={handleChange}
         />
       </Grid>
       <Grid item>
         <MuiTelInput
-          id='phoneNumber'
+          name='phoneNumber'
           label='Phone Number'
           variant='outlined'
-          value={fields.phoneNumber},
+          value={fields.phoneNumber}
           onChange={handlePhoneValueChange}
           style={styles.itemWidth}
         />
-        </Grid>
-        <Grid item>
-          <TextField
-            id='password'
-            label='Password'
-            type='password'
-            variant='outlined'
-            value={fields.password},
-            style={styles.itemWidth}
-            />
-        </Grid>
+      </Grid>
+      <Grid item>
+        <TextField
+          name='password'
+          label='Password'
+          type='password'
+          variant='outlined'
+          value={fields.password}
+          style={styles.itemWidth}
+          onChange={handleChange}
+        />
+      </Grid>
       <Grid item>
         <Button
           variant='contained'
-          style={styles.itemWidth}
+          style={styles.button}
           onClick={handleSubmit}
         >
           Register

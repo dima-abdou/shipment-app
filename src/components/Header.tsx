@@ -18,7 +18,7 @@ export const Header = () => {
   const theme = useTheme();
   return (
     <AppBar
-      sx={{ backgroundColor: 'primary.dark', color: 'secondary.contrastText' }}
+      sx={{ backgroundColor: '#2c3e52', color: 'secondary.contrastText' }}
     >
       <Toolbar>
         <IconButton
@@ -29,9 +29,17 @@ export const Header = () => {
           {isOpened ? <ChevronLeftIcon /> : <MenuIcon />}
         </IconButton>
         <BackButton></BackButton>
-        <Typography variant='h6' sx={{ margin: 'auto' }}>
+        {/* <Typography variant='h6' sx={{ margin: 'auto' }}>
           ShipShare
-        </Typography>
+        </Typography> */}
+        <img
+          src={`/images/logoShipBlack.jpg`} //{`/images/shipment-logo.png`}
+          loading='lazy'
+          style={{
+            width: '34%',
+            marginLeft: '16%',
+          }}
+        />
       </Toolbar>
     </AppBar>
   );

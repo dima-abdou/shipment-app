@@ -14,6 +14,8 @@ import ShipmentList from '../shipment-list/ShipmentList';
 import TripList from '../trip-list/TripList';
 import { useState } from 'react';
 import { isEmpty } from '../../utils';
+import User from '../../models/user';
+import { IUser } from '../../types';
 
 const Landing = () => {
   const styles = {
@@ -26,12 +28,14 @@ const Landing = () => {
       width: '95%',
       margin: '5px',
       height: '80px',
+      backgroundColor: '#2c3e52',
     },
   };
 
   const navigate = useNavigate();
 
   const [isShipment, toggleIsShipment] = useState<boolean>();
+  const loggedInUser: IUser = User.getUser;
 
   // return (
   //   <Box
@@ -108,13 +112,13 @@ const Landing = () => {
             </Button>
           </Grid>
         </Grid>
-        {isEmpty(isShipment) && (
+        {loggedInUser !== null && isEmpty(isShipment) && (
           <Grid style={styles.welcome} margin={3} item xs={12} md={6}>
             <Typography variant='h4' fontWeight={700}>
               Welcome,
             </Typography>
             <Typography variant='h5' fontWeight={700}>
-              Mrs. Ali Abdo
+              Mrs. {loggedInUser?.firstName} {loggedInUser?.lastName}
             </Typography>
             <Typography component='legend'>Your Rating</Typography>
             <Rating

@@ -1,19 +1,14 @@
-import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './components/landing/Landing';
 import ShipmentList from './components/shipment-list/ShipmentList';
-import { Layout } from './components';
 
-// import Home from "../pages/Home";
-// import Pizzas from "../pages/Pizzas";
-// import PizzaDetails from "../pages/PizzaDetails";
-// import Cart from "../pages/Cart";
-// import Checkout from "../pages/Checkout";
 import Login from './components/login';
 import TripDetails from './components/trip-details/TripDetails';
 import TripList from './components/trip-list/TripList';
 import Register from './components/Register';
 import ShipmentDetails from './components/shipmet-details/ShipmentDetails';
+import CreateTrip from './components/create-trip/CreateTrip';
+import CreateShipment from './components/create-shipment/CreateShipment';
 
 const Routers = () => {
   return (
@@ -26,6 +21,8 @@ const Routers = () => {
       <Route path='/landing' element={<Landing />} />
       <Route path='/shipmentlist' element={<ShipmentList />} />
       <Route path='/triplist' element={<TripList />} />
+      <Route path='/createtrip' element={<CreateTrip />} />
+      <Route path='/createshipment' element={<CreateShipment />} />
     </Routes>
   );
 };

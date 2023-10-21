@@ -1,21 +1,9 @@
-import {
-  Avatar,
-  Button,
-  Divider,
-  Grid,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  TextField,
-  Typography,
-} from '@mui/material';
-import React from 'react';
+import { Button, Grid, TextField } from '@mui/material';
 import { useNavigate } from 'react-router';
 import GoogleMapReact from 'google-map-react';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
@@ -36,7 +24,7 @@ const styles = {
   },
   datePickerGridItem: {
     paddingTop: '5px',
-    width: '90%',
+    width: '360px',
   },
   mapItem: {
     minWidth: '370px',
@@ -46,7 +34,7 @@ const styles = {
   title: {
     width: '100%',
     color: 'white',
-    backgroundColor: 'lightslategray',
+    backgroundColor: '#919bac',
     paddingTop: '5px',
     paddingBottom: '5px',
     fontWeight: '500',
@@ -54,7 +42,8 @@ const styles = {
     marginTop: '5px',
   },
   submitButton: {
-    width: '340px',
+    width: '360px',
+    backgroundColor: '#2c3e52',
   },
 };
 
@@ -231,11 +220,11 @@ const TripDetails = () => {
             /> */}
           </GoogleMapReact>
         </Grid>
-        <Grid item style={styles.gridItem}>
+        {/* <Grid item style={styles.gridItem}>
           <Button variant='contained' style={styles.submitButton}>
             Create
           </Button>
-        </Grid>
+        </Grid> */}
       </Grid>
     </div>
   );

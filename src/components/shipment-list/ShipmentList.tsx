@@ -19,7 +19,8 @@ const styles = {
     paddingTop: '5px',
   },
   submitButton: {
-    width: '340px',
+    width: '360px',
+    backgroundColor: '#2c3e52',
   },
 };
 
@@ -28,6 +29,10 @@ const ShipmentList = () => {
 
   const navigateToShipmentDetails = () => {
     navigate('/shipmentdetails');
+  };
+
+  const navigateToCreateShipment = () => {
+    navigate('/createshipment');
   };
 
   return (
@@ -133,7 +138,11 @@ const ShipmentList = () => {
         </Card>
       </Grid>
       <Grid item>
-        <Button variant='contained' style={styles.submitButton}>
+        <Button
+          variant='contained'
+          style={styles.submitButton}
+          onClick={navigateToCreateShipment}
+        >
           Submit Shipment
         </Button>
       </Grid>

@@ -20,7 +20,8 @@ const styles = {
     paddingTop: '5px',
   },
   submitButton: {
-    width: '340px',
+    width: '360px',
+    backgroundColor: '#2c3e52',
   },
 };
 
@@ -29,6 +30,10 @@ const TripList = () => {
 
   const navigateToShipmentDetails = () => {
     navigate('/tripdetails');
+  };
+
+  const navigateToCreateTrip = () => {
+    navigate('/createtrip');
   };
 
   return (
@@ -134,7 +139,11 @@ const TripList = () => {
         </Card>
       </Grid>
       <Grid item>
-        <Button variant='contained' style={styles.submitButton}>
+        <Button
+          variant='contained'
+          style={styles.submitButton}
+          onClick={navigateToCreateTrip}
+        >
           Submit Trip
         </Button>
       </Grid>

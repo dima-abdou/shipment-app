@@ -7,4 +7,3 @@ export * from './Header';
 export * from './Layout';
 export * from './MenuItem';
 export * from './MenuItemsList';
-export const [user, setUser] = useState<IUser>();

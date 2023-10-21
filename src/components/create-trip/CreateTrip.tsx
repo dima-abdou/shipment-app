@@ -13,6 +13,11 @@ import {
 import React from 'react';
 import { useNavigate } from 'react-router';
 import GoogleMapReact from 'google-map-react';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import dayjs, { Dayjs } from 'dayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const styles = {
   container: {
@@ -29,6 +34,10 @@ const styles = {
     paddingTop: '5px',
     width: '100%',
   },
+  datePickerGridItem: {
+    paddingTop: '5px',
+    width: '360px',
+  },
   mapItem: {
     minWidth: '370px',
     height: '120px',
@@ -37,16 +46,20 @@ const styles = {
   title: {
     width: '100%',
     color: 'white',
-    backgroundColor: '#919bac',
+    backgroundColor: 'lightslategray',
     paddingTop: '5px',
     paddingBottom: '5px',
     fontWeight: '500',
     paddingLeft: '8%',
     marginTop: '5px',
   },
+  submitButton: {
+    width: '360px',
+    backgroundColor: '#2c3e52',
+  },
 };
 
-const ShipmentDetails: React.FC<{}> = () => {
+const CreateTrip = () => {
   const defaultProps = {
     center: {
       lat: 10.99835602,
@@ -73,7 +86,25 @@ const ShipmentDetails: React.FC<{}> = () => {
         spacing={1.5}
       >
         <Grid item style={styles.title}>
-          <span>Shipment Request Details</span>
+          <span>Create Trip</span>
+        </Grid>
+        <Grid item style={styles.gridItem}>
+          <TextField
+            id='first-name'
+            label='First name'
+            variant='outlined'
+            style={styles.itemWidth}
+            size='small'
+          />
+        </Grid>
+        <Grid item style={styles.gridItem}>
+          <TextField
+            id='last-name'
+            label='Last Name'
+            variant='outlined'
+            style={styles.itemWidth}
+            size='small'
+          />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
@@ -88,6 +119,15 @@ const ShipmentDetails: React.FC<{}> = () => {
           <TextField
             id='from-city'
             label='From City'
+            variant='outlined'
+            style={styles.itemWidth}
+            size='small'
+          />
+        </Grid>
+        <Grid item style={styles.gridItem}>
+          <TextField
+            id='from-airport'
+            label='From Airport'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
@@ -110,6 +150,25 @@ const ShipmentDetails: React.FC<{}> = () => {
             style={styles.itemWidth}
             size='small'
           />
+        </Grid>
+        <Grid item style={styles.gridItem}>
+          <TextField
+            id='to-airport'
+            label='To Airport'
+            variant='outlined'
+            style={styles.itemWidth}
+            size='small'
+          />
+        </Grid>
+        <Grid item style={styles.datePickerGridItem}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['MobileDatePicker']}>
+              <MobileDatePicker
+                label='From Date'
+                defaultValue={dayjs('2022-04-17')}
+              />
+            </DemoContainer>
+          </LocalizationProvider>
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
@@ -173,103 +232,14 @@ const ShipmentDetails: React.FC<{}> = () => {
             /> */}
           </GoogleMapReact>
         </Grid>
-        <Grid item style={styles.title}>
-          <span>Matched Trips</span>
-        </Grid>
-        <Grid item style={styles.tripsGridItem}>
-          <List
-            sx={{
-              width: '100%',
-              maxWidth: 360,
-              bgcolor: 'background.paper',
-              paddingTop: '0px',
-            }}
-          >
-            <ListItem alignItems='flex-start'>
-              {/* <ListItemAvatar>
-                <Avatar alt='Remy Sharp' src='/static/images/avatar/1.jpg' />
-              </ListItemAvatar> */}
-              <ListItemText
-                primary='Matched Trip 1'
-                secondary={
-                  <>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Departure Date: 13/08/2023
-                    </Typography>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Arrivale Date: 13/08/2023
-                    </Typography>
-                  </>
-                }
-              />
-            </ListItem>
-            <Divider variant='fullWidth' component='li' />
-            <ListItem alignItems='flex-start'>
-              {/* <ListItemAvatar>
-                <Avatar alt='Travis Howard' src='/static/images/avatar/2.jpg' />
-              </ListItemAvatar> */}
-              <ListItemText
-                primary='Matched Trip 2'
-                secondary={
-                  <>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Departure Date: 13/08/2023
-                    </Typography>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Arrivale Date: 13/08/2023
-                    </Typography>
-                  </>
-                }
-              />
-            </ListItem>
-            <Divider variant='fullWidth' component='li' />
-            <ListItem alignItems='flex-start'>
-              {/* <ListItemAvatar>
-                <Avatar alt='Cindy Baker' src='/static/images/avatar/3.jpg' />
-              </ListItemAvatar> */}
-              <ListItemText
-                primary='Matched Trip 3'
-                secondary={
-                  <>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Departure Date: 13/08/2023
-                    </Typography>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Arrivale Date: 13/08/2023
-                    </Typography>
-                  </>
-                }
-              />
-            </ListItem>
-          </List>
+        <Grid item style={styles.gridItem}>
+          <Button variant='contained' style={styles.submitButton}>
+            Create
+          </Button>
         </Grid>
       </Grid>
     </div>
   );
 };
 
-export default ShipmentDetails;
+export default CreateTrip;
