@@ -106,10 +106,6 @@ const CreateShipment: React.FC<{}> = () => {
 
   const navigate = useNavigate();
 
-  const navigateToLandingPage = () => {
-    navigate('/landing');
-  };
-
   const getCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(function (position) {
       console.log('Latitude is :', position.coords.latitude);
@@ -129,6 +125,15 @@ const CreateShipment: React.FC<{}> = () => {
       };
       setCurrentMapProps(currentProps);
     });
+  };
+
+  const renderMarkers = (map:any, maps:any)  =>{
+    let marker = new maps.Marker({
+      position: currenMapProps.center,
+      map,
+      title: 'Hello World!'
+    });
+    map.setCenter(currenMapProps.center);
   };
 
   useEffect(() => {
@@ -183,9 +188,6 @@ const CreateShipment: React.FC<{}> = () => {
     } else {
       toast.error('Problem Occured');
     }
-  };
-  const apiHasLoaded = (map: any, maps: any) => {
-    console.log('Loaded!');
   };
   const handleSubmit = async (event: any) => {
     await DataService.post(
@@ -337,13 +339,14 @@ const CreateShipment: React.FC<{}> = () => {
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          {/* <GoogleMapReact
+          <GoogleMapReact
             yesIWantToUseGoogleMapApiInternals
-            bootstrapURLKeys={{ key: '' }}
+            bootstrapURLKeys={{ key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I' }}
             defaultCenter={currenMapProps.center}
             defaultZoom={currenMapProps.zoom}
+            onGoogleApiLoaded={({map, maps}) => renderMarkers(map, maps)}
           >
-          </GoogleMapReact> */}
+          </GoogleMapReact>
           {/* <Map
             zoom={14}
             style={styles.mapItem}
@@ -365,12 +368,14 @@ const CreateShipment: React.FC<{}> = () => {
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          {/* <GoogleMapReact
-            bootstrapURLKeys={{ key: '' }}
+          <GoogleMapReact
+            yesIWantToUseGoogleMapApiInternals
+            bootstrapURLKeys={{ key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I' }}
             defaultCenter={currenMapProps.center}
             defaultZoom={currenMapProps.zoom}
+            onGoogleApiLoaded={({map, maps}) => renderMarkers(map, maps)}
           >
-          </GoogleMapReact> */}
+          </GoogleMapReact>
         </Grid>
         <Grid item style={styles.gridItem}>
           <Button

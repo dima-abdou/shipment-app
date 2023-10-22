@@ -24,6 +24,7 @@ import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import User from '../../models/user';
 import {
+  ILocation,
   ILookup,
   IUser,
   locationInitials,
@@ -31,6 +32,8 @@ import {
 } from '../../types';
 import { toast } from 'react-toastify';
 import DataService from '../../services/dataServices';
+import GoogleMapReact from 'google-map-react';
+import { debug } from 'console';
 
 const styles = {
   container: {
@@ -83,6 +86,17 @@ const CreateTrip = () => {
     },
     zoom: 11,
   };
+  const [currenMapProps, setCurrentMapProps] = useState({
+    center: {
+      lat: 10.99835602,
+      lng: 77.01502627,
+    },
+    zoom: 11,
+  });
+
+  const [currentLocation, setCurrentLocation] =
+    useState<ILocation>(locationInitials);
+    
   const [fromCountries, setFromCountries] = useState<ILookup[]>(
     new Array(lookupInitialValues),
   );
@@ -103,10 +117,26 @@ const CreateTrip = () => {
   );
   const navigate = useNavigate();
 
-  const navigateToLandingPage = () => {
-    navigate('/landing');
+  const getCurrentLocation = () => {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      console.log('Latitude is :', position.coords.latitude);
+      console.log('Longitude is :', position.coords.longitude);
+      const currLocation: ILocation = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        displayName: 'Lebanon',
+      };
+      setCurrentLocation(currLocation);
+      let currentProps = {
+        center: {
+          lat: currLocation.latitude,
+          lng: currLocation.longitude,
+        },
+        zoom: 11,
+      };
+      setCurrentMapProps(currentProps);
+    });
   };
-
   const loggedInUser: IUser = User.getUser;
   const [fields, setFields] = useState<Record<string, any>>({
     fromAirportId: '',
@@ -121,6 +151,7 @@ const CreateTrip = () => {
 
   useEffect(() => {
     onLanding();
+    getCurrentLocation();
   }, []);
 
   const onLanding = async () => {
@@ -159,6 +190,15 @@ const CreateTrip = () => {
       ...prevState,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const renderMarkers = (map:any, maps:any)  =>{
+    let marker = new maps.Marker({
+      position: currenMapProps.center,
+      map,
+      title: 'Hello World!'
+    });
+    map.setCenter(currenMapProps.center);
   };
 
   const fromCountryChange = async (e: any) => {
@@ -438,12 +478,14 @@ const CreateTrip = () => {
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          {/* <GoogleMapReact
-            bootstrapURLKeys={{ key: '' }}
+          <GoogleMapReact
+          yesIWantToUseGoogleMapApiInternals
+            bootstrapURLKeys={{ key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I' }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
+            onGoogleApiLoaded={({map, maps}) => renderMarkers(map, maps)}
           >
-          </GoogleMapReact> */}
+          </GoogleMapReact>
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
@@ -455,12 +497,14 @@ const CreateTrip = () => {
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          {/* <GoogleMapReact
-            bootstrapURLKeys={{ key: '' }}
+          <GoogleMapReact
+          yesIWantToUseGoogleMapApiInternals
+            bootstrapURLKeys={{ key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I' }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
+            onGoogleApiLoaded={({map, maps}) => renderMarkers(map, maps)}
           >
-          </GoogleMapReact> */}
+          </GoogleMapReact>
         </Grid>
         <Grid item style={styles.gridItem}>
           <Button
