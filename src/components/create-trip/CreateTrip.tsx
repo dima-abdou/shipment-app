@@ -16,14 +16,19 @@ import {
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
-import GoogleMapReact from 'google-map-react';
+// import GoogleMapReact from 'google-map-react';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs, { Dayjs } from 'dayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import User from '../../models/user';
-import { ILookup, IUser, locationInitials, lookupInitialValues } from '../../types';
+import {
+  ILookup,
+  IUser,
+  locationInitials,
+  lookupInitialValues,
+} from '../../types';
 import { toast } from 'react-toastify';
 import DataService from '../../services/dataServices';
 
@@ -37,6 +42,7 @@ const styles = {
   },
   gridItem: {
     paddingTop: '5px',
+    width: '360px',
   },
   tripsGridItem: {
     paddingTop: '5px',
@@ -64,6 +70,8 @@ const styles = {
   submitButton: {
     width: '360px',
     backgroundColor: '#2c3e52',
+    marginTop: '10px',
+    marginButton: '10px',
   },
 };
 
@@ -75,12 +83,24 @@ const CreateTrip = () => {
     },
     zoom: 11,
   };
-  const [fromCountries,setFromCountries] = useState<ILookup[]>(new Array(lookupInitialValues));
-  const [toCountries,setToCountries] = useState<ILookup[]>(new Array(lookupInitialValues));
-  const [fromCities,setFromCities] = useState<ILookup[]>(new Array(lookupInitialValues));
-  const [toCities,setToCities] = useState<ILookup[]>(new Array(lookupInitialValues));
-  const [fromAirports,setFromAirports] = useState<ILookup[]>(new Array(lookupInitialValues));
-  const [toAirports,setToAirports] = useState<ILookup[]>(new Array(lookupInitialValues));
+  const [fromCountries, setFromCountries] = useState<ILookup[]>(
+    new Array(lookupInitialValues),
+  );
+  const [toCountries, setToCountries] = useState<ILookup[]>(
+    new Array(lookupInitialValues),
+  );
+  const [fromCities, setFromCities] = useState<ILookup[]>(
+    new Array(lookupInitialValues),
+  );
+  const [toCities, setToCities] = useState<ILookup[]>(
+    new Array(lookupInitialValues),
+  );
+  const [fromAirports, setFromAirports] = useState<ILookup[]>(
+    new Array(lookupInitialValues),
+  );
+  const [toAirports, setToAirports] = useState<ILookup[]>(
+    new Array(lookupInitialValues),
+  );
   const navigate = useNavigate();
 
   const navigateToLandingPage = () => {
@@ -94,37 +114,43 @@ const CreateTrip = () => {
     fromDate: '2023-10-21T21:28:47.569Z',
     toDate: '2023-10-21T21:28:47.569Z',
     availableSpaceInCMCube: 0,
-    availableWeightInKG : 0,
+    availableWeightInKG: 0,
     userFromLocation: locationInitials,
-    userToLocation: locationInitials
+    userToLocation: locationInitials,
   });
 
   useEffect(() => {
     onLanding();
-  },[]);
+  }, []);
 
-  const onLanding = async () =>{
-    var countriesRequest = await DataService.get("api/lookups/countries",undefined,undefined,undefined,loggedInUser.token);
-    if(countriesRequest.ok){
-      const countries : ILookup[] = await  countriesRequest.json();
+  const onLanding = async () => {
+    var countriesRequest = await DataService.get(
+      'api/lookups/countries',
+      undefined,
+      undefined,
+      undefined,
+      loggedInUser.token,
+    );
+    if (countriesRequest.ok) {
+      const countries: ILookup[] = await countriesRequest.json();
       setFromCountries(countries);
       setToCountries(countries);
-    }else{
-      toast("Problem Occuried.");
+    } else {
+      toast('Problem Occuried.');
     }
-  }
+  };
 
-  const handleFromDateChange = (e:any) => {
+  const handleFromDateChange = (e: any) => {
     setFields((prevState) => ({
       ...prevState,
-      ["fromDate"]: e.toISOString(),
+      fromDate: e.toISOString(),
     }));
   };
 
-  const handleToDateChange = (e:any) => {
+  const handleToDateChange = (e: any) => {
     setFields((prevState) => ({
       ...prevState,
-      ["toDate"]: e.toISOString(),
+      toDate: e.toISOString(),
     }));
   };
 
@@ -136,56 +162,82 @@ const CreateTrip = () => {
   };
 
   const fromCountryChange = async (e: any) => {
-      
-    var citiesRequest = await DataService.get("api/lookups/countries/" + e.target.value + "/cities", undefined, undefined, undefined, loggedInUser.token);
-    if(citiesRequest.ok){
-      const cities : ILookup[] = await citiesRequest.json();
+    var citiesRequest = await DataService.get(
+      'api/lookups/countries/' + e.target.value + '/cities',
+      undefined,
+      undefined,
+      undefined,
+      loggedInUser.token,
+    );
+    if (citiesRequest.ok) {
+      const cities: ILookup[] = await citiesRequest.json();
       setFromCities(cities);
-    }
-    else {
+    } else {
       toast.error('Problem Occured');
     }
   };
 
-const toCountryChange = async (e: any) => {
-  var citiesRequest = await DataService.get("api/lookups/countries/" + e.target.value + "/cities", undefined, undefined, undefined, loggedInUser.token);
-    if(citiesRequest.ok){
-      const cities : ILookup[] = await citiesRequest.json();
+  const toCountryChange = async (e: any) => {
+    var citiesRequest = await DataService.get(
+      'api/lookups/countries/' + e.target.value + '/cities',
+      undefined,
+      undefined,
+      undefined,
+      loggedInUser.token,
+    );
+    if (citiesRequest.ok) {
+      const cities: ILookup[] = await citiesRequest.json();
       setToCities(cities);
-    }
-    else {
+    } else {
       toast.error('Problem Occured');
     }
   };
 
-  const fromCityChange = async(e : any) => {
-    var airportsRequest = await DataService.get("api/lookups/cities/" + e.target.value + "/airports",undefined,undefined,undefined,loggedInUser.token);
-    if(airportsRequest.ok){
-      const airports : ILookup[] = await airportsRequest.json();
+  const fromCityChange = async (e: any) => {
+    var airportsRequest = await DataService.get(
+      'api/lookups/cities/' + e.target.value + '/airports',
+      undefined,
+      undefined,
+      undefined,
+      loggedInUser.token,
+    );
+    if (airportsRequest.ok) {
+      const airports: ILookup[] = await airportsRequest.json();
       setFromAirports(airports);
-    }
-    else {
+    } else {
       toast.error('Problem Occured');
     }
   };
 
-  const toCityChange = async(e : any) => {
-    var airportsRequest = await DataService.get("api/lookups/cities/" + e.target.value + "/airports",undefined,undefined,undefined,loggedInUser.token);
-    if(airportsRequest.ok){
-      const airports : ILookup[] = await airportsRequest.json();
+  const toCityChange = async (e: any) => {
+    var airportsRequest = await DataService.get(
+      'api/lookups/cities/' + e.target.value + '/airports',
+      undefined,
+      undefined,
+      undefined,
+      loggedInUser.token,
+    );
+    if (airportsRequest.ok) {
+      const airports: ILookup[] = await airportsRequest.json();
       setToAirports(airports);
-    }
-    else {
+    } else {
       toast.error('Problem Occured');
     }
   };
 
   const handleSubmit = async (event: any) => {
-    var result = await DataService.post("api/trip",fields,undefined,undefined,undefined,loggedInUser.token);
-    if(result.ok){
-      const id:string = await result.text();
+    var result = await DataService.post(
+      'api/trip',
+      fields,
+      undefined,
+      undefined,
+      undefined,
+      loggedInUser.token,
+    );
+    if (result.ok) {
+      const id: string = await result.text();
       navigate('/tripdetails/' + id);
-    }else {
+    } else {
       toast.error('Problem Occured');
     }
   };
@@ -203,118 +255,136 @@ const toCountryChange = async (e: any) => {
           <span>Create Trip</span>
         </Grid>
         <Grid item style={styles.gridItem}>
-        <FormControl variant="outlined">
-            <InputLabel id="fromCountry">From Country</InputLabel>
+          <FormControl variant='outlined' fullWidth={true}>
+            <InputLabel id='fromCountry'>From Country</InputLabel>
             <Select
-                labelId="fromCountry"
-                name="fromCountry"
-                onChange={fromCountryChange}
-                label="Model"
+              labelId='fromCountry'
+              name='fromCountry'
+              onChange={fromCountryChange}
+              label='Model'
             >
-              {fromCountries != null && fromCountries.length > 0 ? fromCountries.map(country=> {
-                // Here goes your models option
-                return <MenuItem value={country.id}>
-                    <em>{country.name}</em>
-                </MenuItem>
-                }) : null
-               }
+              {fromCountries != null && fromCountries.length > 0
+                ? fromCountries.map((country) => {
+                    // Here goes your models option
+                    return (
+                      <MenuItem value={country.id}>
+                        <em>{country.name}</em>
+                      </MenuItem>
+                    );
+                  })
+                : null}
             </Select>
-        </FormControl>
+          </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-        <FormControl variant="outlined">
-            <InputLabel id="fromCity">From City</InputLabel>
+          <FormControl variant='outlined' fullWidth={true}>
+            <InputLabel id='fromCity'>From City</InputLabel>
             <Select
-                labelId="fromCity"
-                name="fromCity"
-                label="Model"
-                onChange={fromCityChange}
+              labelId='fromCity'
+              name='fromCity'
+              label='Model'
+              onChange={fromCityChange}
             >
-              {fromCities != null && fromCities.length > 0 ? fromCities.map(city=> {
-                // Here goes your models option
-                return <MenuItem value={city.id}>
-                    <em>{city.name}</em>
-                </MenuItem>
-                }) : null
-               }
+              {fromCities != null && fromCities.length > 0
+                ? fromCities.map((city) => {
+                    // Here goes your models option
+                    return (
+                      <MenuItem value={city.id}>
+                        <em>{city.name}</em>
+                      </MenuItem>
+                    );
+                  })
+                : null}
             </Select>
-        </FormControl>
+          </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-        <FormControl variant="outlined">
-            <InputLabel id="fromAirport">From Airport</InputLabel>
+          <FormControl variant='outlined' fullWidth={true}>
+            <InputLabel id='fromAirport'>From Airport</InputLabel>
             <Select
-                labelId="fromAirport"
-                name="fromAirportId"
-                label="Model"
-                onChange={handleChange}
+              labelId='fromAirport'
+              name='fromAirportId'
+              label='Model'
+              onChange={handleChange}
             >
-              {fromAirports != null && fromAirports.length > 0 ? fromAirports.map(airport=> {
-                // Here goes your models option
-                return <MenuItem value={airport.id}>
-                    <em>{airport.name}</em>
-                </MenuItem>
-                }) : null
-               }
+              {fromAirports != null && fromAirports.length > 0
+                ? fromAirports.map((airport) => {
+                    // Here goes your models option
+                    return (
+                      <MenuItem value={airport.id}>
+                        <em>{airport.name}</em>
+                      </MenuItem>
+                    );
+                  })
+                : null}
             </Select>
-        </FormControl>
+          </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-        <FormControl variant="outlined">
-            <InputLabel id="toCountry">To Country</InputLabel>
+          <FormControl variant='outlined' fullWidth={true}>
+            <InputLabel id='toCountry'>To Country</InputLabel>
             <Select
-                labelId="toCountry"
-                name="toCountry"
-                onChange={toCountryChange}
-                label="Model"
+              labelId='toCountry'
+              name='toCountry'
+              onChange={toCountryChange}
+              label='Model'
             >
-              {toCountries != null && toCountries.length > 0 ? toCountries.map(country=> {
-                // Here goes your models option
-                return <MenuItem value={country.id}>
-                    <em>{country.name}</em>
-                </MenuItem>
-                }) : null
-               }
+              {toCountries != null && toCountries.length > 0
+                ? toCountries.map((country) => {
+                    // Here goes your models option
+                    return (
+                      <MenuItem value={country.id}>
+                        <em>{country.name}</em>
+                      </MenuItem>
+                    );
+                  })
+                : null}
             </Select>
-        </FormControl>
+          </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-        <FormControl variant="outlined">
-            <InputLabel id="toCity">To City</InputLabel>
+          <FormControl variant='outlined' fullWidth={true}>
+            <InputLabel id='toCity'>To City</InputLabel>
             <Select
-                labelId="toCity"
-                name="toCity"
-                label="Model"
-                onChange={toCityChange}
+              labelId='toCity'
+              name='toCity'
+              label='Model'
+              onChange={toCityChange}
             >
-              {toCities != null && toCities.length > 0 ? toCities.map(city=> {
-                // Here goes your models option
-                return <MenuItem value={city.id}>
-                    <em>{city.name}</em>
-                </MenuItem>
-                }) : null
-               }
+              {toCities != null && toCities.length > 0
+                ? toCities.map((city) => {
+                    // Here goes your models option
+                    return (
+                      <MenuItem value={city.id}>
+                        <em>{city.name}</em>
+                      </MenuItem>
+                    );
+                  })
+                : null}
             </Select>
-        </FormControl>
+          </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-        <FormControl variant="outlined">
-            <InputLabel id="toAirport">to Airport</InputLabel>
+          <FormControl variant='outlined' fullWidth={true}>
+            <InputLabel id='toAirport'>to Airport</InputLabel>
             <Select
-                labelId="toAirport"
-                name="toAirportId"
-                label="Model"
-                onChange={handleChange}
+              labelId='toAirport'
+              name='toAirportId'
+              label='Model'
+              onChange={handleChange}
             >
-              {toAirports != null && toAirports.length > 0 ? toAirports.map(airport=> {
-                // Here goes your models option
-                return <MenuItem value={airport.id}>
-                    <em>{airport.name}</em>
-                </MenuItem>
-                }) : null
-               }
+              {toAirports != null && toAirports.length > 0
+                ? toAirports.map((airport) => {
+                    // Here goes your models option
+                    return (
+                      <MenuItem value={airport.id}>
+                        <em>{airport.name}</em>
+                      </MenuItem>
+                    );
+                  })
+                : null}
             </Select>
-        </FormControl>
+          </FormControl>
         </Grid>
         <Grid item style={styles.datePickerGridItem}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -368,17 +438,12 @@ const toCountryChange = async (e: any) => {
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          <GoogleMapReact
+          {/* <GoogleMapReact
             bootstrapURLKeys={{ key: '' }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
           >
-            {/* <AnyReactComponent
-              lat={59.955413}
-              lng={30.337844}
-              text='My Marker'
-            /> */}
-          </GoogleMapReact>
+          </GoogleMapReact> */}
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
@@ -390,20 +455,19 @@ const toCountryChange = async (e: any) => {
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          <GoogleMapReact
+          {/* <GoogleMapReact
             bootstrapURLKeys={{ key: '' }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
           >
-            {/* <AnyReactComponent
-              lat={59.955413}
-              lng={30.337844}
-              text='My Marker'
-            /> */}
-          </GoogleMapReact>
+          </GoogleMapReact> */}
         </Grid>
         <Grid item style={styles.gridItem}>
-          <Button variant='contained' style={styles.submitButton} onClick={handleSubmit}>
+          <Button
+            variant='contained'
+            style={styles.submitButton}
+            onClick={handleSubmit}
+          >
             Create
           </Button>
         </Grid>

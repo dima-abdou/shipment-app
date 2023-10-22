@@ -22,11 +22,11 @@ export const MenuItem: React.FC<Props> = ({
       sx={{
         '&.Mui-selected': {
           backgroundColor: 'primary.white',
-          color: 'common.white',
+          color: '#2c3e52',
         },
         '&:hover': {
           backgroundColor: 'primary.light',
-          color: 'common.white',
+          color: '#2c3e52',
         },
       }}
       onClick={onClick}
@@ -39,7 +39,7 @@ export const MenuItem: React.FC<Props> = ({
           }),
         ]}
       >
-        <Icon sx={{ color: 'secondary.dark' }} />
+        <Icon sx={{ color: '#2c3e52' }} />
       </ListItemIcon>
       <ListItemText primary={literal} />
     </ListItem>

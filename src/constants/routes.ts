@@ -1,6 +1,7 @@
 export const ROUTES = {
-  main: '/dashboard',
-  orders: '/orders',
-  customers: '/customers',
-  inventory: '/inventory',
+  welcome: '/landing',
+  shipList: '/shipmentlist',
+  tripList: '/triplist',
+  createShip: '/createtrip',
+  createTrip: '/createshipment',
 };

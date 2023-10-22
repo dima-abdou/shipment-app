@@ -1,6 +1,6 @@
 import { Button, Grid, InputAdornment, TextField } from '@mui/material';
 import { useNavigate } from 'react-router';
-import GoogleMapReact from 'google-map-react';
+// import GoogleMapReact from 'google-map-react';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
@@ -74,8 +74,8 @@ const TripDetails = () => {
     spaceInCMCube: '',
     weightInKG: '',
     userFromLocation: locationInitials,
-    userToLocation : locationInitials
-});
+    userToLocation: locationInitials,
+  });
   const navigate = useNavigate();
 
   const navigateToLandingPage = () => {
@@ -84,19 +84,25 @@ const TripDetails = () => {
 
   useEffect(() => {
     getTripDetails();
-  },[]);
-  
-  const getTripDetails = async() => {
-    var tripR = await DataService.get("api/trip/"+ params.id,undefined,undefined,undefined,loggedInUser.token);
-    if(tripR.ok){
+  }, []);
+
+  const getTripDetails = async () => {
+    var tripR = await DataService.get(
+      'api/trip/' + params.id,
+      undefined,
+      undefined,
+      undefined,
+      loggedInUser.token,
+    );
+    if (tripR.ok) {
       var trip = await tripR.json();
-      const newValues = {... fields};
+      const newValues = { ...fields };
       newValues.fromCountry = trip?.fromCountry?.name;
       newValues.fromCity = trip?.fromCity?.name;
-      newValues.fromAirport = trip?.fromAirport?.name
+      newValues.fromAirport = trip?.fromAirport?.name;
       newValues.toCountry = trip?.toCountry?.name;
       newValues.toCity = trip?.toCity?.name;
-      newValues.toAirport = trip?.toAirport?.name
+      newValues.toAirport = trip?.toAirport?.name;
       newValues.spaceInCMCube = trip?.availableSpaceInCMCube;
       newValues.weightInKG = trip?.availableWeightInKG;
       newValues.fromDate = dayjs(trip?.fromDate);
@@ -127,7 +133,9 @@ const TripDetails = () => {
             value={fields.fromCountry}
             sx={{ m: 0.5, width: '25ch' }}
             InputProps={{
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
             }}
             disabled
           />
@@ -142,7 +150,9 @@ const TripDetails = () => {
             value={fields.fromCity}
             sx={{ m: 0.5, width: '25ch' }}
             InputProps={{
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
             }}
             disabled
           />
@@ -157,7 +167,9 @@ const TripDetails = () => {
             value={fields.fromAirport}
             sx={{ m: 0.5, width: '25ch' }}
             InputProps={{
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
             }}
             disabled
           />
@@ -172,7 +184,9 @@ const TripDetails = () => {
             value={fields.toCountry}
             sx={{ m: 0.5, width: '25ch' }}
             InputProps={{
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
             }}
             disabled
           />
@@ -187,7 +201,9 @@ const TripDetails = () => {
             value={fields.toCity}
             sx={{ m: 0.5, width: '25ch' }}
             InputProps={{
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
             }}
             disabled
           />
@@ -202,7 +218,9 @@ const TripDetails = () => {
             value={fields.toAirport}
             sx={{ m: 0.5, width: '25ch' }}
             InputProps={{
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
             }}
             disabled
           />
@@ -239,7 +257,9 @@ const TripDetails = () => {
             value={fields.spaceInCMCube}
             sx={{ m: 0.5, width: '25ch' }}
             InputProps={{
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
             }}
             disabled
           />
@@ -254,7 +274,9 @@ const TripDetails = () => {
             value={fields.weightInKG}
             sx={{ m: 0.5, width: '25ch' }}
             InputProps={{
-              startAdornment: <InputAdornment position="start"></InputAdornment>,
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
             }}
             disabled
           />
@@ -269,17 +291,12 @@ const TripDetails = () => {
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          <GoogleMapReact
+          {/* <GoogleMapReact
             bootstrapURLKeys={{ key: '' }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
           >
-            {/* <AnyReactComponent
-              lat={59.955413}
-              lng={30.337844}
-              text='My Marker'
-            /> */}
-          </GoogleMapReact>
+          </GoogleMapReact> */}
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
@@ -291,17 +308,12 @@ const TripDetails = () => {
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          <GoogleMapReact
+          {/* <GoogleMapReact
             bootstrapURLKeys={{ key: '' }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
           >
-            {/* <AnyReactComponent
-              lat={59.955413}
-              lng={30.337844}
-              text='My Marker'
-            /> */}
-          </GoogleMapReact>
+          </GoogleMapReact> */}
         </Grid>
         {/* <Grid item style={styles.gridItem}>
           <Button variant='contained' style={styles.submitButton}>

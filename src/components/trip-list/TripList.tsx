@@ -10,7 +10,13 @@ import {
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import DataService from '../../services/dataServices';
-import { ILocation, ILookup, IUser, locationInitials, lookupInitialValues } from '../../types';
+import {
+  ILocation,
+  ILookup,
+  IUser,
+  locationInitials,
+  lookupInitialValues,
+} from '../../types';
 import User from '../../models/user';
 import { arrayBuffer } from 'stream/consumers';
 import internal from 'stream';
@@ -20,7 +26,7 @@ const styles = {
     marginTop: '4%',
     minWidth: '340px',
     borderRadius: '10px',
-    height: '130px',
+    height: '100px',
   },
   MyCardContent: {
     paddingTop: '5px',
@@ -28,39 +34,41 @@ const styles = {
   submitButton: {
     width: '360px',
     backgroundColor: '#2c3e52',
+    marginTop: '20px',
+    marginButton: '10px',
   },
 };
 
 const TripList = () => {
   const loggedInUser: IUser = User.getUser;
-  interface trip  {
-    id: string,
-    fromAirport: ILookup,
-    toAirport: ILookup,
-    fromDate: dayjs.Dayjs,
-    toDate: dayjs.Dayjs,
+  interface trip {
+    id: string;
+    fromAirport: ILookup;
+    toAirport: ILookup;
+    fromDate: dayjs.Dayjs;
+    toDate: dayjs.Dayjs;
+    availableSpaceInCMCube: '';
+    availableWeightInKG: '';
+    UserFromLocation: ILocation;
+    UserToLocation: ILocation;
+  }
+
+  const tripInitials: trip = {
+    id: '',
+    fromAirport: lookupInitialValues,
+    toAirport: lookupInitialValues,
+    fromDate: dayjs(new Date()),
+    toDate: dayjs(new Date()),
     availableSpaceInCMCube: '',
     availableWeightInKG: '',
-    UserFromLocation: ILocation,
-    UserToLocation : ILocation
-};
-
-const tripInitials  : trip = {
-  id: '',
-  fromAirport: lookupInitialValues,
-  toAirport: lookupInitialValues,
-  fromDate: dayjs(new Date()),
-  toDate: dayjs(new Date()),
-  availableSpaceInCMCube: '',
-  availableWeightInKG: '',
-  UserFromLocation: locationInitials,
-  UserToLocation : locationInitials
-};
-  const [make,setMake] = useState<boolean>(false);
+    UserFromLocation: locationInitials,
+    UserToLocation: locationInitials,
+  };
+  const [make, setMake] = useState<boolean>(false);
   const [trips, setTrips] = useState<trip[]>(new Array(tripInitials));
   const navigate = useNavigate();
 
-  const navigateToTripDetails = (id:string) => {
+  const navigateToTripDetails = (id: string) => {
     navigate('/tripdetails/' + id);
   };
 
@@ -70,20 +78,26 @@ const tripInitials  : trip = {
 
   useEffect(() => {
     getTrips();
-  },[]);
-  
-  const getTrips = async() => {
-    var tripR = await DataService.get("api/trip",undefined,undefined,undefined,loggedInUser.token);
-    if(tripR.ok && tripR.status == 200){
+  }, []);
+
+  const getTrips = async () => {
+    var tripR = await DataService.get(
+      'api/trip',
+      undefined,
+      undefined,
+      undefined,
+      loggedInUser.token,
+    );
+    if (tripR.ok && tripR.status == 200) {
       setMake(true);
-      const trip : trip[] = await tripR.json();
-      const newValues =new Array();
-        trip.forEach(element => {
-          element.fromDate = dayjs(element.fromDate);
-          element.toDate = dayjs(element.toDate);
-          newValues.push(element)
-        });
-        setTrips(newValues);
+      const trip: trip[] = await tripR.json();
+      const newValues: any = [];
+      trip.forEach((element) => {
+        element.fromDate = dayjs(element.fromDate);
+        element.toDate = dayjs(element.toDate);
+        newValues.push(element);
+      });
+      setTrips(newValues);
     }
   };
 
@@ -95,30 +109,39 @@ const tripInitials  : trip = {
       alignItems='center'
       spacing={1}
     >
-      { make ? trips.map(t => {
-        return <Grid item>
-        <Card style={styles.MyCard}>
-          <CardActionArea onClick={() => navigateToTripDetails(t.id)}>
-            <CardContent style={styles.MyCardContent}>
-              <Typography variant='h6' component='div'>
-                Trip
-              </Typography>
-              <Typography sx={{ fontSize: 14 }} color='text.secondary'>
-                From {t.fromAirport.name} - To {t.toAirport.name}
-              </Typography>
-              <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-                {t.fromDate.format('MM/DD/YYYY')} - {t.toDate.format('MM/DD/YYYY')}
-              </Typography>
-              <Typography variant='body2'>Available Space in cm Cube : {t.availableSpaceInCMCube}</Typography>
-              <Typography variant='body2'>Available Weight in Kg: {t.availableWeightInKG}</Typography>
-            </CardContent>
-          </CardActionArea>
-          {/* <CardActions>
+      {make
+        ? trips.map((t) => {
+            return (
+              <Grid item>
+                <Card style={styles.MyCard}>
+                  <CardActionArea onClick={() => navigateToTripDetails(t.id)}>
+                    <CardContent style={styles.MyCardContent}>
+                      <Typography variant='h6' component='div'>
+                        Trip
+                      </Typography>
+                      <Typography sx={{ fontSize: 14 }} color='text.secondary'>
+                        From {t.fromAirport.name} - To {t.toAirport.name}
+                      </Typography>
+                      <Typography sx={{ mb: 1.5 }} color='text.secondary'>
+                        {t.fromDate.format('MM/DD/YYYY')} -{' '}
+                        {t.toDate.format('MM/DD/YYYY')}
+                      </Typography>
+                      <Typography variant='body2'>
+                        Available Space in cm Cube : {t.availableSpaceInCMCube}
+                      </Typography>
+                      <Typography variant='body2'>
+                        Available Weight in Kg: {t.availableWeightInKG}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                  {/* <CardActions>
         <Button size="small">Learn More</Button>
       </CardActions> */}
-        </Card>
-      </Grid>
-      } ) : null }
+                </Card>
+              </Grid>
+            );
+          })
+        : null}
       <Grid item>
         <Button
           variant='contained'

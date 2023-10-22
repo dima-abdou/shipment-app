@@ -17,7 +17,7 @@ const styles = {
     marginTop: '4%',
     minWidth: '340px',
     borderRadius: '10px',
-    height: '130px',
+    height: '100px',
   },
   MyCardContent: {
     paddingTop: '5px',
@@ -25,34 +25,37 @@ const styles = {
   submitButton: {
     width: '360px',
     backgroundColor: '#2c3e52',
+    marginTop: '20px',
+    marginButton: '10px',
   },
 };
 
 const ShipmentList = () => {
   const loggedInUser: IUser = User.getUser;
   interface shipmentRequest {
-    id: string,
-    fromCity: ILookup,
-    toCity: ILookup,
-    spaceInCMCube: number,
-    weightInKG: number
+    id: string;
+    fromCity: ILookup;
+    toCity: ILookup;
+    spaceInCMCube: number;
+    weightInKG: number;
   }
-  
-const shipmentRequestInitials : shipmentRequest = {
-  id: '',
-  fromCity: lookupInitialValues,
-  toCity : lookupInitialValues,
-  spaceInCMCube: 0,
-  weightInKG: 0
-};
 
+  const shipmentRequestInitials: shipmentRequest = {
+    id: '',
+    fromCity: lookupInitialValues,
+    toCity: lookupInitialValues,
+    spaceInCMCube: 0,
+    weightInKG: 0,
+  };
 
-const [make,setMake] = useState<boolean>(false);
-const [shipmentRequests, setShipmentRequests] = useState<shipmentRequest[]>(new Array(shipmentRequestInitials));
+  const [make, setMake] = useState<boolean>(false);
+  const [shipmentRequests, setShipmentRequests] = useState<shipmentRequest[]>(
+    new Array(shipmentRequestInitials),
+  );
 
   const navigate = useNavigate();
 
-  const navigateToShipmentDetails = (id:string) => {
+  const navigateToShipmentDetails = (id: string) => {
     navigate('/shipmentdetails/' + id);
   };
 
@@ -62,18 +65,24 @@ const [shipmentRequests, setShipmentRequests] = useState<shipmentRequest[]>(new 
 
   useEffect(() => {
     getShipmentRequests();
-  },[]);
+  }, []);
 
-  const getShipmentRequests = async() => {
-    var shipmentR = await DataService.get("api/ShipmentRequest",undefined,undefined,undefined,loggedInUser.token);
-    if(shipmentR.ok && shipmentR.status == 200){
+  const getShipmentRequests = async () => {
+    var shipmentR = await DataService.get(
+      'api/ShipmentRequest',
+      undefined,
+      undefined,
+      undefined,
+      loggedInUser.token,
+    );
+    if (shipmentR.ok && shipmentR.status == 200) {
       setMake(true);
       var trip = await shipmentR.json();
-      const newValues =new Array();
-        trip.forEach((element: shipmentRequest) => {
-          newValues.push(element)
-        });
-        setShipmentRequests(newValues);
+      const newValues: any = [];
+      trip.forEach((element: shipmentRequest) => {
+        newValues.push(element);
+      });
+      setShipmentRequests(newValues);
     }
   };
 
@@ -85,28 +94,38 @@ const [shipmentRequests, setShipmentRequests] = useState<shipmentRequest[]>(new 
       alignItems='center'
       spacing={1}
     >
-      { make ? shipmentRequests.map(s => {
-        return <Grid item>
-        <Card style={styles.MyCard}>
-          <CardActionArea onClick={() => navigateToShipmentDetails(s.id)}>
-            <CardContent style={styles.MyCardContent}>
-              <Typography
-                sx={{ fontSize: 14 }}
-                color='text.secondary'
-                gutterBottom
-              >
-                From {s.fromCity.name} - To {s.toCity.name}
-              </Typography>
-              <Typography variant='body2'>Space in cm Cube: {s.spaceInCMCube}</Typography>
-              <Typography variant='body2'>Weight in Kg: {s.weightInKG}</Typography>
-            </CardContent>
-          </CardActionArea>
-          {/* <CardActions>
+      {make
+        ? shipmentRequests.map((s) => {
+            return (
+              <Grid item>
+                <Card style={styles.MyCard}>
+                  <CardActionArea
+                    onClick={() => navigateToShipmentDetails(s.id)}
+                  >
+                    <CardContent style={styles.MyCardContent}>
+                      <Typography
+                        sx={{ fontSize: 14 }}
+                        color='text.secondary'
+                        gutterBottom
+                      >
+                        From {s.fromCity.name} - To {s.toCity.name}
+                      </Typography>
+                      <Typography variant='body2'>
+                        Space in cm Cube: {s.spaceInCMCube}
+                      </Typography>
+                      <Typography variant='body2'>
+                        Weight in Kg: {s.weightInKG}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                  {/* <CardActions>
         <Button size="small">Learn More</Button>
       </CardActions> */}
-        </Card>
-      </Grid>
-      }): null }
+                </Card>
+              </Grid>
+            );
+          })
+        : null}
       <Grid item>
         <Button
           variant='contained'
