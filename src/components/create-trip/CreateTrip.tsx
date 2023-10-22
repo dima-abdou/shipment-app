@@ -2,15 +2,19 @@ import {
   Avatar,
   Button,
   Divider,
+  FormControl,
   Grid,
+  InputLabel,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
+  MenuItem,
+  Select,
   TextField,
   Typography,
 } from '@mui/material';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import GoogleMapReact from 'google-map-react';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
@@ -18,6 +22,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs, { Dayjs } from 'dayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import User from '../../models/user';
+import { ILookup, IUser, locationInitials, lookupInitialValues } from '../../types';
+import { toast } from 'react-toastify';
+import DataService from '../../services/dataServices';
 
 const styles = {
   container: {
@@ -67,14 +75,120 @@ const CreateTrip = () => {
     },
     zoom: 11,
   };
-
+  const [fromCountries,setFromCountries] = useState<ILookup[]>(new Array(lookupInitialValues));
+  const [toCountries,setToCountries] = useState<ILookup[]>(new Array(lookupInitialValues));
+  const [fromCities,setFromCities] = useState<ILookup[]>(new Array(lookupInitialValues));
+  const [toCities,setToCities] = useState<ILookup[]>(new Array(lookupInitialValues));
+  const [fromAirports,setFromAirports] = useState<ILookup[]>(new Array(lookupInitialValues));
+  const [toAirports,setToAirports] = useState<ILookup[]>(new Array(lookupInitialValues));
   const navigate = useNavigate();
 
   const navigateToLandingPage = () => {
     navigate('/landing');
   };
 
-  const handleSubmit = (event: any) => {};
+  const loggedInUser: IUser = User.getUser;
+  const [fields, setFields] = useState<Record<string, any>>({
+    fromAirportId: '',
+    toAirportId: '',
+    fromDate: '2023-10-21T21:28:47.569Z',
+    toDate: '2023-10-21T21:28:47.569Z',
+    availableSpaceInCMCube: 0,
+    availableWeightInKG : 0,
+    userFromLocation: locationInitials,
+    userToLocation: locationInitials
+  });
+
+  useEffect(() => {
+    onLanding();
+  },[]);
+
+  const onLanding = async () =>{
+    var countriesRequest = await DataService.get("api/lookups/countries",undefined,undefined,undefined,loggedInUser.token);
+    if(countriesRequest.ok){
+      const countries : ILookup[] = await  countriesRequest.json();
+      setFromCountries(countries);
+      setToCountries(countries);
+    }else{
+      toast("Problem Occuried.");
+    }
+  }
+
+  const handleFromDateChange = (e:any) => {
+    setFields((prevState) => ({
+      ...prevState,
+      ["fromDate"]: e.toISOString(),
+    }));
+  };
+
+  const handleToDateChange = (e:any) => {
+    setFields((prevState) => ({
+      ...prevState,
+      ["toDate"]: e.toISOString(),
+    }));
+  };
+
+  const handleChange = (e: any) => {
+    setFields((prevState) => ({
+      ...prevState,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const fromCountryChange = async (e: any) => {
+      
+    var citiesRequest = await DataService.get("api/lookups/countries/" + e.target.value + "/cities", undefined, undefined, undefined, loggedInUser.token);
+    if(citiesRequest.ok){
+      const cities : ILookup[] = await citiesRequest.json();
+      setFromCities(cities);
+    }
+    else {
+      toast.error('Problem Occured');
+    }
+  };
+
+const toCountryChange = async (e: any) => {
+  var citiesRequest = await DataService.get("api/lookups/countries/" + e.target.value + "/cities", undefined, undefined, undefined, loggedInUser.token);
+    if(citiesRequest.ok){
+      const cities : ILookup[] = await citiesRequest.json();
+      setToCities(cities);
+    }
+    else {
+      toast.error('Problem Occured');
+    }
+  };
+
+  const fromCityChange = async(e : any) => {
+    var airportsRequest = await DataService.get("api/lookups/cities/" + e.target.value + "/airports",undefined,undefined,undefined,loggedInUser.token);
+    if(airportsRequest.ok){
+      const airports : ILookup[] = await airportsRequest.json();
+      setFromAirports(airports);
+    }
+    else {
+      toast.error('Problem Occured');
+    }
+  };
+
+  const toCityChange = async(e : any) => {
+    var airportsRequest = await DataService.get("api/lookups/cities/" + e.target.value + "/airports",undefined,undefined,undefined,loggedInUser.token);
+    if(airportsRequest.ok){
+      const airports : ILookup[] = await airportsRequest.json();
+      setToAirports(airports);
+    }
+    else {
+      toast.error('Problem Occured');
+    }
+  };
+
+  const handleSubmit = async (event: any) => {
+    var result = await DataService.post("api/trip",fields,undefined,undefined,undefined,loggedInUser.token);
+    if(result.ok){
+      const id:string = await result.text();
+      navigate('/tripdetails/' + id);
+    }else {
+      toast.error('Problem Occured');
+    }
+  };
 
   return (
     <div style={styles.container}>
@@ -89,103 +203,159 @@ const CreateTrip = () => {
           <span>Create Trip</span>
         </Grid>
         <Grid item style={styles.gridItem}>
-          <TextField
-            id='first-name'
-            label='First name'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
+        <FormControl variant="outlined">
+            <InputLabel id="fromCountry">From Country</InputLabel>
+            <Select
+                labelId="fromCountry"
+                name="fromCountry"
+                onChange={fromCountryChange}
+                label="Model"
+            >
+              {fromCountries != null && fromCountries.length > 0 ? fromCountries.map(country=> {
+                // Here goes your models option
+                return <MenuItem value={country.id}>
+                    <em>{country.name}</em>
+                </MenuItem>
+                }) : null
+               }
+            </Select>
+        </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-          <TextField
-            id='last-name'
-            label='Last Name'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
+        <FormControl variant="outlined">
+            <InputLabel id="fromCity">From City</InputLabel>
+            <Select
+                labelId="fromCity"
+                name="fromCity"
+                label="Model"
+                onChange={fromCityChange}
+            >
+              {fromCities != null && fromCities.length > 0 ? fromCities.map(city=> {
+                // Here goes your models option
+                return <MenuItem value={city.id}>
+                    <em>{city.name}</em>
+                </MenuItem>
+                }) : null
+               }
+            </Select>
+        </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-          <TextField
-            id='from-country'
-            label='From Country'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
+        <FormControl variant="outlined">
+            <InputLabel id="fromAirport">From Airport</InputLabel>
+            <Select
+                labelId="fromAirport"
+                name="fromAirportId"
+                label="Model"
+                onChange={handleChange}
+            >
+              {fromAirports != null && fromAirports.length > 0 ? fromAirports.map(airport=> {
+                // Here goes your models option
+                return <MenuItem value={airport.id}>
+                    <em>{airport.name}</em>
+                </MenuItem>
+                }) : null
+               }
+            </Select>
+        </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-          <TextField
-            id='from-city'
-            label='From City'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
+        <FormControl variant="outlined">
+            <InputLabel id="toCountry">To Country</InputLabel>
+            <Select
+                labelId="toCountry"
+                name="toCountry"
+                onChange={toCountryChange}
+                label="Model"
+            >
+              {toCountries != null && toCountries.length > 0 ? toCountries.map(country=> {
+                // Here goes your models option
+                return <MenuItem value={country.id}>
+                    <em>{country.name}</em>
+                </MenuItem>
+                }) : null
+               }
+            </Select>
+        </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-          <TextField
-            id='from-airport'
-            label='From Airport'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
+        <FormControl variant="outlined">
+            <InputLabel id="toCity">To City</InputLabel>
+            <Select
+                labelId="toCity"
+                name="toCity"
+                label="Model"
+                onChange={toCityChange}
+            >
+              {toCities != null && toCities.length > 0 ? toCities.map(city=> {
+                // Here goes your models option
+                return <MenuItem value={city.id}>
+                    <em>{city.name}</em>
+                </MenuItem>
+                }) : null
+               }
+            </Select>
+        </FormControl>
         </Grid>
         <Grid item style={styles.gridItem}>
-          <TextField
-            id='to-country'
-            label='To-Country'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
-        </Grid>
-        <Grid item style={styles.gridItem}>
-          <TextField
-            id='to-city'
-            label='To City'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
-        </Grid>
-        <Grid item style={styles.gridItem}>
-          <TextField
-            id='to-airport'
-            label='To Airport'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
+        <FormControl variant="outlined">
+            <InputLabel id="toAirport">to Airport</InputLabel>
+            <Select
+                labelId="toAirport"
+                name="toAirportId"
+                label="Model"
+                onChange={handleChange}
+            >
+              {toAirports != null && toAirports.length > 0 ? toAirports.map(airport=> {
+                // Here goes your models option
+                return <MenuItem value={airport.id}>
+                    <em>{airport.name}</em>
+                </MenuItem>
+                }) : null
+               }
+            </Select>
+        </FormControl>
         </Grid>
         <Grid item style={styles.datePickerGridItem}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={['MobileDatePicker']}>
               <MobileDatePicker
                 label='From Date'
-                defaultValue={dayjs('2022-04-17')}
+                defaultValue={dayjs(new Date())}
+                onChange={handleFromDateChange}
+              />
+            </DemoContainer>
+          </LocalizationProvider>
+        </Grid>
+        <Grid item style={styles.datePickerGridItem}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['MobileDatePicker']}>
+              <MobileDatePicker
+                label='To Date'
+                defaultValue={dayjs(new Date())}
+                onChange={handleToDateChange}
               />
             </DemoContainer>
           </LocalizationProvider>
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='space-in-cube'
+            name='availableSpaceInCMCube'
             label='Space In Cube'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            onChange={handleChange}
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='weight-in-kg'
+            name='availableWeightInKG'
             label='Weight In KG'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            onChange={handleChange}
           />
         </Grid>
         <Grid item style={styles.gridItem}>
@@ -233,7 +403,7 @@ const CreateTrip = () => {
           </GoogleMapReact>
         </Grid>
         <Grid item style={styles.gridItem}>
-          <Button variant='contained' style={styles.submitButton}>
+          <Button variant='contained' style={styles.submitButton} onClick={handleSubmit}>
             Create
           </Button>
         </Grid>

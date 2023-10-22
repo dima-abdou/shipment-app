@@ -3,6 +3,7 @@ import {
   Button,
   Divider,
   Grid,
+  InputAdornment,
   List,
   ListItem,
   ListItemAvatar,
@@ -10,9 +11,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import GoogleMapReact from 'google-map-react';
+import DataService from '../../services/dataServices';
+import { ILookup, IUser, lookupInitialValues } from '../../types';
+import User from '../../models/user';
+import { useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 
 const styles = {
   container: {
@@ -46,7 +52,7 @@ const styles = {
   },
 };
 
-const ShipmentDetails: React.FC<{}> = () => {
+const ShipmentDetails: React.FC = () => {
   const defaultProps = {
     center: {
       lat: 10.99835602,
@@ -54,14 +60,80 @@ const ShipmentDetails: React.FC<{}> = () => {
     },
     zoom: 11,
   };
+  interface matchedTrip {
+    id: string,
+    userFirstName: string,
+    userLastName: string,
+    fromAirport: ILookup,
+    toAirport : ILookup,
+    fromDate: dayjs.Dayjs,
+    toDate: dayjs.Dayjs,
+    availableSpaceInCMCube: number,
+    availableWeightInKG: number
+  };
 
+ const matchedTripInitials : matchedTrip = {
+  id: '',
+  userFirstName: '',
+  userLastName: '',
+  fromAirport: lookupInitialValues,
+  toAirport: lookupInitialValues,
+  fromDate: dayjs(new Date()),
+  toDate: dayjs(new Date()),
+  availableSpaceInCMCube: 0,
+  availableWeightInKG: 0
+ };
+
+  const params = useParams();
+  const loggedInUser: IUser = User.getUser;
+  const [fields, setFields] = useState<Record<string, any>>({
+    fromCountry: '',
+    fromCity: '',
+    toCountry: '',
+    toCity: '',
+    spaceInCMCube: '',
+    weightInKG: '',
+    userFromLocation: '',
+    userToLocation : ''
+});
+  const [matchedTrips, setMatchedTrips] = useState<matchedTrip[]>(new Array(matchedTripInitials));
+  const [make,setMake] = useState<boolean>(false);
+
+useEffect(() => {
+  getShipmentDetails();
+},[]);
+
+const getShipmentDetails = async() => {
+  var shipmentRequestR = await DataService.get("api/shipmentrequest/"+ params.id,undefined,undefined,undefined,loggedInUser.token);
+  if(shipmentRequestR.ok){
+    var shipmentData = await shipmentRequestR.json();
+    const newValues = {... fields};
+    newValues.fromCountry = shipmentData?.fromCountry?.name;
+    newValues.fromCity = shipmentData?.fromCity?.name;
+    newValues.toCountry = shipmentData?.toCountry?.name;
+    newValues.toCity = shipmentData?.toCity?.name;
+    newValues.spaceInCMCube = shipmentData?.spaceInCMCube;
+    newValues.weightInKG = shipmentData?.weightInKG;
+    setFields(newValues);
+  }
+  var matchedTripsR = await DataService.get("api/Trip/shipmentrequests/"+ params.id,undefined,undefined,undefined,loggedInUser.token);
+  if(matchedTripsR.status == 200){
+    setMake(true);
+    const mTrips : matchedTrip[] = await matchedTripsR.json();
+    const tripsValues = new Array();
+    mTrips.forEach(element => {
+      element.fromDate = dayjs(element.fromDate);
+      element.toDate = dayjs(element.toDate);
+      tripsValues.push(element);
+    });
+    setMatchedTrips(tripsValues);
+  }
+};
   const navigate = useNavigate();
 
   const navigateToLandingPage = () => {
     navigate('/landing');
   };
-
-  const handleSubmit = (event: any) => {};
 
   return (
     <div style={styles.container}>
@@ -77,56 +149,92 @@ const ShipmentDetails: React.FC<{}> = () => {
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='from-country'
+            name='fromCountry'
             label='From Country'
             variant='outlined'
+            sx={{ m: 0.5, width: '25ch' }}
             style={styles.itemWidth}
             size='small'
+            value={fields.fromCountry}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='from-city'
+            name='fromCity'
             label='From City'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            value={fields.fromCity}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='to-country'
+            name='toCountry'
             label='To-Country'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.toCountry}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='to-city'
+            name='toCity'
             label='To City'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.toCity}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='space-in-cube'
+            name='spaceInCMCube'
             label='Space In Cube'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.spaceInCMCube}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='weight-in-kg'
+            name='weightInKG'
             label='Weight In KG'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.weightInKG}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
@@ -136,6 +244,7 @@ const ShipmentDetails: React.FC<{}> = () => {
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            disabled
           />
         </Grid>
         <Grid item style={styles.mapItem}>
@@ -185,12 +294,13 @@ const ShipmentDetails: React.FC<{}> = () => {
               paddingTop: '0px',
             }}
           >
-            <ListItem alignItems='flex-start'>
+            {make ? matchedTrips.map(m => {
+              return <ListItem alignItems='flex-start'>
               {/* <ListItemAvatar>
                 <Avatar alt='Remy Sharp' src='/static/images/avatar/1.jpg' />
               </ListItemAvatar> */}
               <ListItemText
-                primary='Matched Trip 1'
+                primary={m.userFirstName + ' ' + m.userLastName}
                 secondary={
                   <>
                     <Typography
@@ -198,73 +308,22 @@ const ShipmentDetails: React.FC<{}> = () => {
                       color='text.secondary'
                       gutterBottom
                     >
-                      Departure Date: 13/08/2023
+                      From: {m.fromAirport.name} To: {m.toAirport.name}
                     </Typography>
                     <Typography
                       sx={{ fontSize: 14 }}
                       color='text.secondary'
                       gutterBottom
                     >
-                      Arrivale Date: 13/08/2023
+                     {m.fromDate.format('MM/DD/YYYY')} - {m.toDate.format('MM/DD/YYYY')}
                     </Typography>
+                    <Typography variant='body2'>Available Space in cm Cube : {m.availableSpaceInCMCube}</Typography>
+                    <Typography variant='body2'>Available Weight in Kg: {m.availableWeightInKG}</Typography>
                   </>
                 }
               />
             </ListItem>
-            <Divider variant='fullWidth' component='li' />
-            <ListItem alignItems='flex-start'>
-              {/* <ListItemAvatar>
-                <Avatar alt='Travis Howard' src='/static/images/avatar/2.jpg' />
-              </ListItemAvatar> */}
-              <ListItemText
-                primary='Matched Trip 2'
-                secondary={
-                  <>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Departure Date: 13/08/2023
-                    </Typography>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Arrivale Date: 13/08/2023
-                    </Typography>
-                  </>
-                }
-              />
-            </ListItem>
-            <Divider variant='fullWidth' component='li' />
-            <ListItem alignItems='flex-start'>
-              {/* <ListItemAvatar>
-                <Avatar alt='Cindy Baker' src='/static/images/avatar/3.jpg' />
-              </ListItemAvatar> */}
-              <ListItemText
-                primary='Matched Trip 3'
-                secondary={
-                  <>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Departure Date: 13/08/2023
-                    </Typography>
-                    <Typography
-                      sx={{ fontSize: 14 }}
-                      color='text.secondary'
-                      gutterBottom
-                    >
-                      Arrivale Date: 13/08/2023
-                    </Typography>
-                  </>
-                }
-              />
-            </ListItem>
+            }) : null}
           </List>
         </Grid>
       </Grid>

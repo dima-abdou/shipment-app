@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -8,6 +8,12 @@ import {
   Typography,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import DataService from '../../services/dataServices';
+import { ILocation, ILookup, IUser, locationInitials, lookupInitialValues } from '../../types';
+import User from '../../models/user';
+import { arrayBuffer } from 'stream/consumers';
+import internal from 'stream';
 
 const styles = {
   MyCard: {
@@ -26,14 +32,59 @@ const styles = {
 };
 
 const TripList = () => {
+  const loggedInUser: IUser = User.getUser;
+  interface trip  {
+    id: string,
+    fromAirport: ILookup,
+    toAirport: ILookup,
+    fromDate: dayjs.Dayjs,
+    toDate: dayjs.Dayjs,
+    availableSpaceInCMCube: '',
+    availableWeightInKG: '',
+    UserFromLocation: ILocation,
+    UserToLocation : ILocation
+};
+
+const tripInitials  : trip = {
+  id: '',
+  fromAirport: lookupInitialValues,
+  toAirport: lookupInitialValues,
+  fromDate: dayjs(new Date()),
+  toDate: dayjs(new Date()),
+  availableSpaceInCMCube: '',
+  availableWeightInKG: '',
+  UserFromLocation: locationInitials,
+  UserToLocation : locationInitials
+};
+  const [make,setMake] = useState<boolean>(false);
+  const [trips, setTrips] = useState<trip[]>(new Array(tripInitials));
   const navigate = useNavigate();
 
-  const navigateToShipmentDetails = () => {
-    navigate('/tripdetails');
+  const navigateToTripDetails = (id:string) => {
+    navigate('/tripdetails/' + id);
   };
 
   const navigateToCreateTrip = () => {
     navigate('/createtrip');
+  };
+
+  useEffect(() => {
+    getTrips();
+  },[]);
+  
+  const getTrips = async() => {
+    var tripR = await DataService.get("api/trip",undefined,undefined,undefined,loggedInUser.token);
+    if(tripR.ok && tripR.status == 200){
+      setMake(true);
+      const trip : trip[] = await tripR.json();
+      const newValues =new Array();
+        trip.forEach(element => {
+          element.fromDate = dayjs(element.fromDate);
+          element.toDate = dayjs(element.toDate);
+          newValues.push(element)
+        });
+        setTrips(newValues);
+    }
   };
 
   return (
@@ -44,24 +95,22 @@ const TripList = () => {
       alignItems='center'
       spacing={1}
     >
-      <Grid item>
+      { make ? trips.map(t => {
+        return <Grid item>
         <Card style={styles.MyCard}>
-          <CardActionArea onClick={navigateToShipmentDetails}>
+          <CardActionArea onClick={() => navigateToTripDetails(t.id)}>
             <CardContent style={styles.MyCardContent}>
               <Typography variant='h6' component='div'>
-                Trip 1
+                Trip
               </Typography>
-              <Typography
-                sx={{ fontSize: 14 }}
-                color='text.secondary'
-                gutterBottom
-              >
-                From (---) - To (---)
+              <Typography sx={{ fontSize: 14 }} color='text.secondary'>
+                From {t.fromAirport.name} - To {t.toAirport.name}
               </Typography>
               <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-                8:30am - 10:50am
+                {t.fromDate.format('MM/DD/YYYY')} - {t.toDate.format('MM/DD/YYYY')}
               </Typography>
-              <Typography variant='body2'>Available Weight: 7K</Typography>
+              <Typography variant='body2'>Available Space in cm Cube : {t.availableSpaceInCMCube}</Typography>
+              <Typography variant='body2'>Available Weight in Kg: {t.availableWeightInKG}</Typography>
             </CardContent>
           </CardActionArea>
           {/* <CardActions>
@@ -69,75 +118,7 @@ const TripList = () => {
       </CardActions> */}
         </Card>
       </Grid>
-      <Grid item>
-        <Card style={styles.MyCard}>
-          <CardContent style={styles.MyCardContent}>
-            <Typography variant='h6' component='div'>
-              Trip 2
-            </Typography>
-            <Typography
-              sx={{ fontSize: 14 }}
-              color='text.secondary'
-              gutterBottom
-            >
-              From (---) - To (---)
-            </Typography>
-            <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-              9:30am - 11:50am
-            </Typography>
-            <Typography variant='body2'>Available Weight: 8K</Typography>
-          </CardContent>
-          {/* <CardActions>
-        <Button size="small">Learn More</Button>
-      </CardActions> */}
-        </Card>
-      </Grid>
-      <Grid item>
-        <Card style={styles.MyCard}>
-          <CardContent style={styles.MyCardContent}>
-            <Typography variant='h6' component='div'>
-              Trip 3
-            </Typography>
-            <Typography
-              sx={{ fontSize: 14 }}
-              color='text.secondary'
-              gutterBottom
-            >
-              From (---) - To (---)
-            </Typography>
-            <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-              10:30am - 12:50pm
-            </Typography>
-            <Typography variant='body2'>Available Weight: 6k</Typography>
-          </CardContent>
-          {/* <CardActions>
-        <Button size="small">Learn More</Button>
-      </CardActions> */}
-        </Card>
-      </Grid>
-      <Grid item>
-        <Card style={styles.MyCard}>
-          <CardContent style={styles.MyCardContent}>
-            <Typography variant='h6' component='div'>
-              Trip 4
-            </Typography>
-            <Typography
-              sx={{ fontSize: 14 }}
-              color='text.secondary'
-              gutterBottom
-            >
-              From (---) - To (---)
-            </Typography>
-            <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-              10:30am - 12:50pm
-            </Typography>
-            <Typography variant='body2'>Available Weight: 10k</Typography>
-          </CardContent>
-          {/* <CardActions>
-        <Button size="small">Learn More</Button>
-      </CardActions> */}
-        </Card>
-      </Grid>
+      } ) : null }
       <Grid item>
         <Button
           variant='contained'

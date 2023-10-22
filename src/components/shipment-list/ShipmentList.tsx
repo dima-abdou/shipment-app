@@ -7,6 +7,10 @@ import {
   Typography,
 } from '@mui/material';
 import { useNavigate } from 'react-router';
+import { ILookup, IUser, lookupInitialValues } from '../../types';
+import User from '../../models/user';
+import { useEffect, useState } from 'react';
+import DataService from '../../services/dataServices';
 
 const styles = {
   MyCard: {
@@ -25,14 +29,52 @@ const styles = {
 };
 
 const ShipmentList = () => {
+  const loggedInUser: IUser = User.getUser;
+  interface shipmentRequest {
+    id: string,
+    fromCity: ILookup,
+    toCity: ILookup,
+    spaceInCMCube: number,
+    weightInKG: number
+  }
+  
+const shipmentRequestInitials : shipmentRequest = {
+  id: '',
+  fromCity: lookupInitialValues,
+  toCity : lookupInitialValues,
+  spaceInCMCube: 0,
+  weightInKG: 0
+};
+
+
+const [make,setMake] = useState<boolean>(false);
+const [shipmentRequests, setShipmentRequests] = useState<shipmentRequest[]>(new Array(shipmentRequestInitials));
+
   const navigate = useNavigate();
 
-  const navigateToShipmentDetails = () => {
-    navigate('/shipmentdetails');
+  const navigateToShipmentDetails = (id:string) => {
+    navigate('/shipmentdetails/' + id);
   };
 
   const navigateToCreateShipment = () => {
     navigate('/createshipment');
+  };
+
+  useEffect(() => {
+    getShipmentRequests();
+  },[]);
+
+  const getShipmentRequests = async() => {
+    var shipmentR = await DataService.get("api/ShipmentRequest",undefined,undefined,undefined,loggedInUser.token);
+    if(shipmentR.ok && shipmentR.status == 200){
+      setMake(true);
+      var trip = await shipmentR.json();
+      const newValues =new Array();
+        trip.forEach((element: shipmentRequest) => {
+          newValues.push(element)
+        });
+        setShipmentRequests(newValues);
+    }
   };
 
   return (
@@ -43,24 +85,20 @@ const ShipmentList = () => {
       alignItems='center'
       spacing={1}
     >
-      <Grid item>
+      { make ? shipmentRequests.map(s => {
+        return <Grid item>
         <Card style={styles.MyCard}>
-          <CardActionArea onClick={navigateToShipmentDetails}>
+          <CardActionArea onClick={() => navigateToShipmentDetails(s.id)}>
             <CardContent style={styles.MyCardContent}>
-              <Typography variant='h6' component='div'>
-                Shipment 1
-              </Typography>
               <Typography
                 sx={{ fontSize: 14 }}
                 color='text.secondary'
                 gutterBottom
               >
-                From (---) - To (---)
+                From {s.fromCity.name} - To {s.toCity.name}
               </Typography>
-              <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-                8:30am - 10:50am
-              </Typography>
-              <Typography variant='body2'>Available Weight: 7K</Typography>
+              <Typography variant='body2'>Space in cm Cube: {s.spaceInCMCube}</Typography>
+              <Typography variant='body2'>Weight in Kg: {s.weightInKG}</Typography>
             </CardContent>
           </CardActionArea>
           {/* <CardActions>
@@ -68,75 +106,7 @@ const ShipmentList = () => {
       </CardActions> */}
         </Card>
       </Grid>
-      <Grid item>
-        <Card style={styles.MyCard}>
-          <CardContent style={styles.MyCardContent}>
-            <Typography variant='h6' component='div'>
-              Shipment 2
-            </Typography>
-            <Typography
-              sx={{ fontSize: 14 }}
-              color='text.secondary'
-              gutterBottom
-            >
-              From (---) - To (---)
-            </Typography>
-            <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-              9:30am - 11:50am
-            </Typography>
-            <Typography variant='body2'>Available Weight: 8K</Typography>
-          </CardContent>
-          {/* <CardActions>
-        <Button size="small">Learn More</Button>
-      </CardActions> */}
-        </Card>
-      </Grid>
-      <Grid item>
-        <Card style={styles.MyCard}>
-          <CardContent style={styles.MyCardContent}>
-            <Typography variant='h6' component='div'>
-              Shipment 3
-            </Typography>
-            <Typography
-              sx={{ fontSize: 14 }}
-              color='text.secondary'
-              gutterBottom
-            >
-              From (---) - To (---)
-            </Typography>
-            <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-              10:30am - 12:50pm
-            </Typography>
-            <Typography variant='body2'>Available Weight: 6k</Typography>
-          </CardContent>
-          {/* <CardActions>
-        <Button size="small">Learn More</Button>
-      </CardActions> */}
-        </Card>
-      </Grid>
-      <Grid item>
-        <Card style={styles.MyCard}>
-          <CardContent style={styles.MyCardContent}>
-            <Typography variant='h6' component='div'>
-              Shipment 4
-            </Typography>
-            <Typography
-              sx={{ fontSize: 14 }}
-              color='text.secondary'
-              gutterBottom
-            >
-              From (---) - To (---)
-            </Typography>
-            <Typography sx={{ mb: 1.5 }} color='text.secondary'>
-              10:30am - 12:50pm
-            </Typography>
-            <Typography variant='body2'>Available Weight: 10k</Typography>
-          </CardContent>
-          {/* <CardActions>
-        <Button size="small">Learn More</Button>
-      </CardActions> */}
-        </Card>
-      </Grid>
+      }): null }
       <Grid item>
         <Button
           variant='contained'

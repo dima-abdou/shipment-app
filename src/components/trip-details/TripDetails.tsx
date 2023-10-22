@@ -1,4 +1,4 @@
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, Grid, InputAdornment, TextField } from '@mui/material';
 import { useNavigate } from 'react-router';
 import GoogleMapReact from 'google-map-react';
 import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
@@ -6,6 +6,11 @@ import { LocalizationProvider } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useParams } from 'react-router-dom';
+import { IUser, locationInitials } from '../../types';
+import User from '../../models/user';
+import { useEffect, useState } from 'react';
+import DataService from '../../services/dataServices';
 
 const styles = {
   container: {
@@ -55,14 +60,50 @@ const TripDetails = () => {
     },
     zoom: 11,
   };
-
+  const params = useParams();
+  const loggedInUser: IUser = User.getUser;
+  const [fields, setFields] = useState<Record<string, any>>({
+    fromCountry: '',
+    fromCity: '',
+    fromAirport: '',
+    toCountry: '',
+    toCity: '',
+    toAirport: '',
+    fromDate: dayjs(new Date()),
+    toDate: dayjs(new Date()),
+    spaceInCMCube: '',
+    weightInKG: '',
+    userFromLocation: locationInitials,
+    userToLocation : locationInitials
+});
   const navigate = useNavigate();
 
   const navigateToLandingPage = () => {
     navigate('/landing');
   };
 
-  const handleSubmit = (event: any) => {};
+  useEffect(() => {
+    getTripDetails();
+  },[]);
+  
+  const getTripDetails = async() => {
+    var tripR = await DataService.get("api/trip/"+ params.id,undefined,undefined,undefined,loggedInUser.token);
+    if(tripR.ok){
+      var trip = await tripR.json();
+      const newValues = {... fields};
+      newValues.fromCountry = trip?.fromCountry?.name;
+      newValues.fromCity = trip?.fromCity?.name;
+      newValues.fromAirport = trip?.fromAirport?.name
+      newValues.toCountry = trip?.toCountry?.name;
+      newValues.toCity = trip?.toCity?.name;
+      newValues.toAirport = trip?.toAirport?.name
+      newValues.spaceInCMCube = trip?.availableSpaceInCMCube;
+      newValues.weightInKG = trip?.availableWeightInKG;
+      newValues.fromDate = dayjs(trip?.fromDate);
+      newValues.toDate = dayjs(trip?.toDate);
+      setFields(newValues);
+    }
+  };
 
   return (
     <div style={styles.container}>
@@ -78,74 +119,92 @@ const TripDetails = () => {
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='first-name'
-            label='First name'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
-        </Grid>
-        <Grid item style={styles.gridItem}>
-          <TextField
-            id='last-name'
-            label='Last Name'
-            variant='outlined'
-            style={styles.itemWidth}
-            size='small'
-          />
-        </Grid>
-        <Grid item style={styles.gridItem}>
-          <TextField
-            id='from-country'
+            name='fromCountry'
             label='From Country'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.fromCountry}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='from-city'
+            name='fromCity'
             label='From City'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.fromCity}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='from-airport'
+            name='fromAirport'
             label='From Airport'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.fromAirport}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='to-country'
-            label='To-Country'
+            name='toCountry'
+            label='To Country'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.toCountry}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='to-city'
+            name='toCity'
             label='To City'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.toCity}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='to-airport'
+            name='toAirport'
             label='To Airport'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.toAirport}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.datePickerGridItem}>
@@ -153,27 +212,51 @@ const TripDetails = () => {
             <DemoContainer components={['MobileDatePicker']}>
               <MobileDatePicker
                 label='From Date'
-                defaultValue={dayjs('2022-04-17')}
+                value={fields.fromDate}
+                disabled
+              />
+            </DemoContainer>
+          </LocalizationProvider>
+        </Grid>
+        <Grid item style={styles.datePickerGridItem}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['MobileDatePicker']}>
+              <MobileDatePicker
+                label='To Date'
+                value={fields.toDate}
+                disabled
               />
             </DemoContainer>
           </LocalizationProvider>
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='space-in-cube'
+            name='spaceInCMCube'
             label='Space In Cube'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.spaceInCMCube}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
-            id='weight-in-kg'
+            name='weightInKG'
             label='Weight In KG'
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.weightInKG}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"></InputAdornment>,
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.gridItem}>

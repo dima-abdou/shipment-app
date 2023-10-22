@@ -22,6 +22,7 @@ export default class DataService {
     init?: RequestInit,
     secure = true,
     controller?: AbortController,
+    jwtToken?: string
   ): Promise<Response> {
     return this.fetch(
       !apirUrl.startsWith('http') && !apirUrl.includes('prx')
@@ -33,6 +34,7 @@ export default class DataService {
       },
       secure,
       controller,
+      jwtToken
     );
   }
 
