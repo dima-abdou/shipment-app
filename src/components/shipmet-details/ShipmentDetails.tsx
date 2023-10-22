@@ -15,10 +15,17 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 // import GoogleMapReact from 'google-map-react';
 import DataService from '../../services/dataServices';
-import { ILookup, IUser, lookupInitialValues } from '../../types';
+import {
+  ILocation,
+  ILookup,
+  IUser,
+  locationInitials,
+  lookupInitialValues,
+} from '../../types';
 import User from '../../models/user';
 import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
+import GoogleMapReact from 'google-map-react';
 
 const styles = {
   container: {
@@ -39,6 +46,7 @@ const styles = {
     minWidth: '370px',
     height: '120px',
     paddingTop: '5px',
+    marginButton: '10px',
   },
   title: {
     width: '100%',
@@ -48,7 +56,7 @@ const styles = {
     paddingBottom: '5px',
     fontWeight: '500',
     paddingLeft: '8%',
-    marginTop: '5px',
+    marginTop: '15px',
   },
 };
 
@@ -103,6 +111,7 @@ const ShipmentDetails: React.FC = () => {
 
   useEffect(() => {
     getShipmentDetails();
+    getCurrentLocation();
   }, []);
 
   const getShipmentDetails = async () => {
@@ -147,6 +156,46 @@ const ShipmentDetails: React.FC = () => {
 
   const navigateToLandingPage = () => {
     navigate('/landing');
+  };
+  const [currentLocation, setCurrentLocation] =
+    useState<ILocation>(locationInitials);
+
+  const [currenMapProps, setCurrentMapProps] = useState({
+    center: {
+      lat: 10.99835602,
+      lng: 77.01502627,
+    },
+    zoom: 11,
+  });
+
+  const getCurrentLocation = () => {
+    navigator.geolocation.getCurrentPosition(function (position) {
+      console.log('Latitude is :', position.coords.latitude);
+      console.log('Longitude is :', position.coords.longitude);
+      const currLocation: ILocation = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude,
+        displayName: 'Lebanon',
+      };
+      setCurrentLocation(currLocation);
+      let currentProps = {
+        center: {
+          lat: currLocation.latitude,
+          lng: currLocation.longitude,
+        },
+        zoom: 11,
+      };
+      setCurrentMapProps(currentProps);
+    });
+  };
+
+  const renderMarkers = (map: any, maps: any) => {
+    let marker = new maps.Marker({
+      position: currenMapProps.center,
+      map,
+      title: 'Marker',
+    });
+    map.setCenter(currenMapProps.center);
   };
 
   return (
@@ -270,16 +319,26 @@ const ShipmentDetails: React.FC = () => {
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={currentLocation?.displayName}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
+            }}
             disabled
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          {/* <GoogleMapReact
-            bootstrapURLKeys={{ key: '' }}
+          <GoogleMapReact
+            yesIWantToUseGoogleMapApiInternals
+            bootstrapURLKeys={{
+              key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I',
+            }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
-          >
-          </GoogleMapReact> */}
+            onGoogleApiLoaded={({ map, maps }) => renderMarkers(map, maps)}
+          ></GoogleMapReact>
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
@@ -288,15 +347,26 @@ const ShipmentDetails: React.FC = () => {
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.userToLocation.displayName}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
+            }}
+            disabled
           />
         </Grid>
         <Grid item style={styles.mapItem}>
-          {/* <GoogleMapReact
-            bootstrapURLKeys={{ key: '' }}
+          <GoogleMapReact
+            yesIWantToUseGoogleMapApiInternals
+            bootstrapURLKeys={{
+              key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I',
+            }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
-          >
-          </GoogleMapReact> */}
+            onGoogleApiLoaded={({ map, maps }) => renderMarkers(map, maps)}
+          ></GoogleMapReact>
         </Grid>
         <Grid item style={styles.title}>
           <span>Matched Trips</span>

@@ -23,10 +23,10 @@ import internal from 'stream';
 
 const styles = {
   MyCard: {
-    marginTop: '4%',
+    marginTop: '20px',
     minWidth: '340px',
     borderRadius: '10px',
-    height: '100px',
+    height: '160px',
   },
   MyCardContent: {
     paddingTop: '5px',

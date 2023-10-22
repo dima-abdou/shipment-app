@@ -4,6 +4,7 @@ import {
   Divider,
   FormControl,
   Grid,
+  InputAdornment,
   InputLabel,
   List,
   ListItem,
@@ -68,7 +69,7 @@ const styles = {
     paddingBottom: '5px',
     fontWeight: '500',
     paddingLeft: '8%',
-    marginTop: '5px',
+    marginTop: '15px',
   },
   submitButton: {
     width: '360px',
@@ -96,7 +97,7 @@ const CreateTrip = () => {
 
   const [currentLocation, setCurrentLocation] =
     useState<ILocation>(locationInitials);
-    
+
   const [fromCountries, setFromCountries] = useState<ILookup[]>(
     new Array(lookupInitialValues),
   );
@@ -135,6 +136,9 @@ const CreateTrip = () => {
         zoom: 11,
       };
       setCurrentMapProps(currentProps);
+      const newFields = { ...fields };
+      newFields.userFromLocation = currLocation;
+      setFields(newFields);
     });
   };
   const loggedInUser: IUser = User.getUser;
@@ -192,11 +196,23 @@ const CreateTrip = () => {
     }));
   };
 
-  const renderMarkers = (map:any, maps:any)  =>{
+  const handleLocationChange = (e: any) => {
+    const newLocationname: ILocation = {
+      longitude: 0,
+      latitude: 0,
+      displayName: e.target.value,
+    };
+    setFields((prevState) => ({
+      ...prevState,
+      [e.target.name]: newLocationname,
+    }));
+  };
+
+  const renderMarkers = (map: any, maps: any) => {
     let marker = new maps.Marker({
       position: currenMapProps.center,
       map,
-      title: 'Hello World!'
+      title: 'Hello World!',
     });
     map.setCenter(currenMapProps.center);
   };
@@ -475,17 +491,26 @@ const CreateTrip = () => {
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={currentLocation?.displayName}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
+            }}
+            onChange={handleLocationChange}
           />
         </Grid>
         <Grid item style={styles.mapItem}>
           <GoogleMapReact
-          yesIWantToUseGoogleMapApiInternals
-            bootstrapURLKeys={{ key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I' }}
+            yesIWantToUseGoogleMapApiInternals
+            bootstrapURLKeys={{
+              key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I',
+            }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
-            onGoogleApiLoaded={({map, maps}) => renderMarkers(map, maps)}
-          >
-          </GoogleMapReact>
+            onGoogleApiLoaded={({ map, maps }) => renderMarkers(map, maps)}
+          ></GoogleMapReact>
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
@@ -494,17 +519,26 @@ const CreateTrip = () => {
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.userToLocation.displayName}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
+            }}
+            onChange={handleLocationChange}
           />
         </Grid>
         <Grid item style={styles.mapItem}>
           <GoogleMapReact
-          yesIWantToUseGoogleMapApiInternals
-            bootstrapURLKeys={{ key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I' }}
+            yesIWantToUseGoogleMapApiInternals
+            bootstrapURLKeys={{
+              key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I',
+            }}
             defaultCenter={defaultProps.center}
             defaultZoom={defaultProps.zoom}
-            onGoogleApiLoaded={({map, maps}) => renderMarkers(map, maps)}
-          >
-          </GoogleMapReact>
+            onGoogleApiLoaded={({ map, maps }) => renderMarkers(map, maps)}
+          ></GoogleMapReact>
         </Grid>
         <Grid item style={styles.gridItem}>
           <Button

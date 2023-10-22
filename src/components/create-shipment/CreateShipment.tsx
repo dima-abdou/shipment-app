@@ -2,6 +2,7 @@ import {
   Button,
   FormControl,
   Grid,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
@@ -51,7 +52,7 @@ const styles = {
     paddingBottom: '5px',
     fontWeight: '500',
     paddingLeft: '8%',
-    marginTop: '5px',
+    marginTop: '15px',
   },
   submitButton: {
     width: '360px',
@@ -124,14 +125,17 @@ const CreateShipment: React.FC<{}> = () => {
         zoom: 11,
       };
       setCurrentMapProps(currentProps);
+      const newFields = { ...fields };
+      newFields.userFromLocation = currLocation;
+      setFields(newFields);
     });
   };
 
-  const renderMarkers = (map:any, maps:any)  =>{
+  const renderMarkers = (map: any, maps: any) => {
     let marker = new maps.Marker({
       position: currenMapProps.center,
       map,
-      title: 'Hello World!'
+      title: 'Hello World!',
     });
     map.setCenter(currenMapProps.center);
   };
@@ -335,28 +339,25 @@ const CreateShipment: React.FC<{}> = () => {
             variant='outlined'
             style={styles.itemWidth}
             size='small'
-            value={currentLocation.displayName}
+            value={currentLocation?.displayName}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
+            }}
           />
         </Grid>
         <Grid item style={styles.mapItem}>
           <GoogleMapReact
             yesIWantToUseGoogleMapApiInternals
-            bootstrapURLKeys={{ key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I' }}
+            bootstrapURLKeys={{
+              key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I',
+            }}
             defaultCenter={currenMapProps.center}
             defaultZoom={currenMapProps.zoom}
-            onGoogleApiLoaded={({map, maps}) => renderMarkers(map, maps)}
-          >
-          </GoogleMapReact>
-          {/* <Map
-            zoom={14}
-            style={styles.mapItem}
-            initialCenter={{
-              lat: currenMapProps.center.lat,
-              lng: currenMapProps.center.lng,
-            }}
-          >
-            <Marker onClick={() => {}} />
-          </Map> */}
+            onGoogleApiLoaded={({ map, maps }) => renderMarkers(map, maps)}
+          ></GoogleMapReact>
         </Grid>
         <Grid item style={styles.gridItem}>
           <TextField
@@ -365,17 +366,26 @@ const CreateShipment: React.FC<{}> = () => {
             variant='outlined'
             style={styles.itemWidth}
             size='small'
+            value={fields.userToLocation.displayName}
+            onChange={handleChange}
+            sx={{ m: 0.5, width: '25ch' }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position='start'></InputAdornment>
+              ),
+            }}
           />
         </Grid>
         <Grid item style={styles.mapItem}>
           <GoogleMapReact
             yesIWantToUseGoogleMapApiInternals
-            bootstrapURLKeys={{ key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I' }}
+            bootstrapURLKeys={{
+              key: 'AIzaSyCnkWjDu0SN6yJQ0KylJQ3GvqK-jhNj_1I',
+            }}
             defaultCenter={currenMapProps.center}
             defaultZoom={currenMapProps.zoom}
-            onGoogleApiLoaded={({map, maps}) => renderMarkers(map, maps)}
-          >
-          </GoogleMapReact>
+            onGoogleApiLoaded={({ map, maps }) => renderMarkers(map, maps)}
+          ></GoogleMapReact>
         </Grid>
         <Grid item style={styles.gridItem}>
           <Button
